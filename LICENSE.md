@@ -1,5 +1,4 @@
-The MIT License (MIT)
-=====================
+# The MIT License (MIT)
 
 Copyright © `2025` `Nicholas H.Tollervey <ntoll@ntoll.org>`
 
