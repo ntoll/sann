@@ -2,4 +2,5 @@ black==25.1.0
 pytest==8.4.1
 pytest-cov==6.2.1
 rich=14.0.0
+setuptools==80.9.0
 twine==6.1.0
