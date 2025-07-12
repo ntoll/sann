@@ -13,6 +13,7 @@ import sys
 sys.path.append("../../")  # Adjust path to import sann module
 import json
 import sann
+from rich.progress import Progress
 
 
 def load_data(file_path):
@@ -46,7 +47,7 @@ def preprocess_data(data):
     return processed_data
 
 
-def train_model(train_data, layers, epochs=1000, learning_rate=0.1):
+def train_model(train_data, layers, epochs=1000, learning_rate=0.1, log=print):
     """
     Train a simple artificial neural network (ANN) using the provided training data.
 
@@ -64,7 +65,7 @@ def train_model(train_data, layers, epochs=1000, learning_rate=0.1):
 
     # Train the ANN
     sann.train(
-        ann, train_data, epochs=epochs, learning_rate=learning_rate, log=print
+        ann, train_data, epochs=epochs, learning_rate=learning_rate, log=log
     )
 
     return ann
@@ -100,6 +101,12 @@ def main():
     train_data = preprocess_data(load_data(train_file))
     test_data = load_data(test_file)
 
+    # Number of epochs to train over
+    epochs = 1000
+
+    # Learning rate (rate of change as weights are adjusted)
+    learning_rate = 0.1
+
     # Define the ANN structure (input layer, hidden layer, output layer)
     layers = [
         64,
@@ -107,16 +114,32 @@ def main():
         10,
     ]  # Example: 64 input nodes, 32 hidden nodes, 10 output nodes
 
-    # Train the model
-    ann = train_model(train_data, layers, epochs=1000, learning_rate=0.1)
+    with Progress() as progress:
+        training_task = progress.add_task("Training network", total=epochs)
 
-    # Evaluate the model
-    accuracy = evaluate_model(ann, test_data)
+        def handle_log(data):
+            if isinstance(data, list):
+                accuracy = evaluate_model(data, test_data)
+                progress.update(
+                    training_task,
+                    advance=1,
+                    description=f"Model accuracy: {accuracy * 100:.2f}%",
+                )
 
-    print(f"Model accuracy: {accuracy * 100:.2f}%")
+        # Train the model
+        ann = train_model(
+            train_data,
+            layers,
+            epochs=epochs,
+            learning_rate=learning_rate,
+            log=handle_log,
+        )
+
+        # Remove the outputs stored in nodes to clean up the ANN
+        ann = sann.clean_ann(ann)
 
     with open("nn.json", "w") as f:
-        json.dump(ann, f)
+        json.dump(ann, f, indent=2)
 
 
 if __name__ == "__main__":

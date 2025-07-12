@@ -62,7 +62,7 @@ def tlu(a, t=0):
     If the activation (a) is greater than the threshold (t), set the output to
     1 (truthy), else set it to 0 (falsey).
     """
-    return 1 if a > t else 0
+    return 1 if a >= t else 0
 
 
 def create_ann(layers):
@@ -120,6 +120,18 @@ def forward_pass(ann, inputs):
             new_outputs.append(node["output"])
         outputs = new_outputs
     return outputs
+
+
+def clean_ann(ann):
+    """
+    Remove the outputs stored in nodes to clean up the ANN, so only the
+    weights and biases remain.
+    """
+    for layer in ann:
+        for node in layer:
+            if "output" in node:
+                del node["output"]
+    return ann
 
 
 def backpropagate(ann, inputs, expected_outputs, learning_rate=0.1):
@@ -206,11 +218,7 @@ def train(
         log(f"Epoch {_ + 1}/{epochs}")
         for inputs, expected_outputs in training_data:
             backpropagate(ann, inputs, expected_outputs, learning_rate)
-    # Remove the outputs stored in nodes to clean up the ANN
-    for layer in ann:
-        for node in layer:
-            if "output" in node:
-                del node["output"]
+        log(clean_ann(ann))
     log("Training complete.")
     return ann
 
