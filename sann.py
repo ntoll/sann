@@ -297,10 +297,6 @@ def roulette_wheel_selection(population):
         if "fitness" in ann:
             total_fitness += ann["fitness"]
 
-    # Ensures random selection if no solutions are "fit".
-    if total_fitness == 0.0:
-        return random.choice(population)
-
     random_point = random.uniform(0.0, total_fitness)
 
     fitness_tally = 0.0
