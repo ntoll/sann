@@ -4,6 +4,7 @@ Test file for the sann package, using PyTest.
 
 import sann
 import pytest
+import random
 from unittest.mock import MagicMock
 
 
@@ -34,12 +35,12 @@ def test_create_ann(sample_ann):
     The first layer should have 3 nodes and the second layer should have 2
     nodes.
     """
-    assert len(sample_ann) == 1  # One layer after input layer
-    assert len(sample_ann[0]) == 2  # Two nodes in the output layer
+    assert len(sample_ann["layers"]) == 1  # One layer after input layer
+    assert len(sample_ann["layers"][0]) == 2  # Two nodes in the output layer
     assert (
-        len(sample_ann[0][0]["weights"]) == 3
+        len(sample_ann["layers"][0][0]["weights"]) == 3
     )  # A node has weights for 3 inputs
-    assert "bias" in sample_ann[0][0]  # A node should have a bias
+    assert "bias" in sample_ann["layers"][0][0]  # A node should have a bias
 
 
 def test_create_ann_too_few_layers():
@@ -76,23 +77,24 @@ def test_clean_ann(sample_ann):
     # Perform a forward pass to populate outputs
     sann.forward_pass(sample_ann, inputs)
     # Check that outputs are present before cleaning
-    assert "output" in sample_ann[0][0]
+    assert "output" in sample_ann["layers"][0][0]
     # Clean the ANN to remove outputs
     cleaned_ann = sann.clean_ann(sample_ann)
-    assert "output" not in cleaned_ann[0][0]
+    assert "output" not in cleaned_ann["layers"][0][0]
 
 
 def test_backpropagate():
     """
     Test the backpropagation of errors through the ANN.
+
     This will check if the weights are updated correctly after a forward pass
     and backpropagation.
     """
     # Create a sample ANN with a hidden layer and an output layer.
     sample_ann = sann.create_ann([3, 5, 2])
     # Set the weights and biases to known values for testing.
-    sample_ann[0][0]["weights"] = [0.5, 0.2, 0.8]
-    sample_ann[0][0]["bias"] = 0
+    sample_ann["layers"][0][0]["weights"] = [0.5, 0.2, 0.8]
+    sample_ann["layers"][0][0]["bias"] = 0
     # Perform a forward pass with sample inputs.
     inputs = [0.5, 0.2, 0.8]
     expected_outputs = [1, 0]  # Expected output for the test.
@@ -102,8 +104,8 @@ def test_backpropagate():
     sann.backpropagate(sample_ann, inputs, expected_outputs)
 
     # Check if weights have been updated (not equal to initial state).
-    assert sample_ann[0][0]["weights"] != [0.5, 0.2, 0.8]  # Example check.
-    assert sample_ann[0][0]["bias"] != 0  # Bias should also be updated.
+    assert sample_ann["layers"][0][0]["weights"] != [0.5, 0.2, 0.8]  # Example check.
+    assert sample_ann["layers"][0][0]["bias"] != 0  # Bias should also be updated.
 
     # Check if the outputs after backpropagation are different.
     new_outputs = sann.forward_pass(sample_ann, inputs)
@@ -119,8 +121,8 @@ def test_train(sample_ann):
     This will check if the ANN can be trained and if the weights are updated.
     """
     # Update the sample ANN to have some known weights and biases.
-    sample_ann[0][0]["weights"] = [0.5, 0.2, 0.8]
-    sample_ann[0][0]["bias"] = 0
+    sample_ann["layers"][0][0]["weights"] = [0.5, 0.2, 0.8]
+    sample_ann["layers"][0][0]["bias"] = 0
 
     # Sample training data: list of tuples (inputs, expected_output)
     train_data = [
@@ -135,8 +137,43 @@ def test_train(sample_ann):
     sann.train(sample_ann, train_data, epochs=10, learning_rate=0.1, log=log)
 
     # Check if weights have been updated after training.
-    assert sample_ann[0][0]["weights"] != [0.5, 0.2, 0.8]
+    assert sample_ann["layers"][0][0]["weights"] != [0.5, 0.2, 0.8]
     # Check if the bias has been updated.
-    assert sample_ann[0][0]["bias"] != 0
+    assert sample_ann["layers"][0][0]["bias"] != 0
     # Check the log function was called
     log.assert_called()
+
+
+def test_roulette_wheel_selection():
+    """
+    Test the roulette wheel selection function for selecting parents based on fitness.
+    """
+    # Create 5 sample ANN with associated fitness values.
+    anns = [sann.create_ann([3, 5, 2]) for _ in range(5)]
+    for ann in anns:
+        ann["fitness"] = random.uniform(0, 1)  # Assign random fitness values
+
+    result = sann.roulette_wheel_selection(anns)
+
+    # Check the result is one of the ANNs.
+    assert result in anns
+    # Check that the selected ANN has a fitness value.
+    assert "fitness" in result
+
+
+def test_crossover():
+    """
+    Test the crossover function for combining two parent ANNs.
+    """
+    # Create two sample ANNs (parents).
+    mum = sann.create_ann([3, 5, 2])
+    dad = sann.create_ann([3, 5, 2])
+
+    # Perform crossover.
+    child1, child2 = sann.crossover(mum, dad)
+
+    # Check that the children have the same structure as the parents.
+    assert len(child1["layers"]) == len(mum["layers"])
+    assert len(child2["layers"]) == len(dad["layers"])
+    for layer in child1["layers"] + child2["layers"]:
+        assert all("weights" in node and "bias" in node for node in layer)

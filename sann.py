@@ -65,41 +65,48 @@ def tlu(a, t=0):
     return 1 if a >= t else 0
 
 
-def create_ann(layers):
+def create_ann(structure):
     """
-    Return a list of nodes that represent a simple artificial neural network
-    (ANN) from the given layer definition (a list containing the number of
-    nodes in each layer of a fully connected feed-forward neural network).
+    Return a dict representing a simple artificial neural network (ANN).
 
-    Each layer in the result is a list of nodes. Each node is a dictionary
-    containing its incoming weights from the previous layer in a fully
-    connected feed-forward network, and the node's bias value. These values
-    are randomly initialised to a value between -1 and 1.
+    The structure argument should be a list containing the number of nodes in
+    each layer of a fully connected feed-forward neural network.
+
+    The resulting dictionary will contain a list of layers, where each layer
+    is a list of nodes. Each node is represented as a dictionary containing
+    its incoming weights from the previous layer and a bias value. The weights
+    and bias are randomly initialised to a value between -1 and 1.
 
     The first layer is ignored since it is the input layer and has no weights
     nor bias associated with it. There must be at least two layers (an input
     layer and an output layer) for the ANN to be valid.
+
+    Other arbitrary arbitrary properties can be added to the returned
+    dictionary, such as a fitness score, which can be used for training or
+    evolution of the ANN, and a structure that defines the topology of the
+    ANN (i.e. the number of nodes in each layer).
     """
-    if len(layers) < 2:
+    if len(structure) < 2:
         raise ValueError(
             "ANN must have at least two layers (input and output)."
         )
-    ann = []
+    layers = []
     # Create nodes with random weights and a bias for each layer except the
     # input layer
-    for i in range(1, len(layers)):
+    for i in range(1, len(structure)):
         layer = []
-        for j in range(layers[i]):
+        for j in range(structure[i]):
             layer.append(
                 {
                     "weights": [
-                        random.uniform(-1, 1) for _ in range(layers[i - 1])
+                        random.uniform(-1, 1) for _ in range(structure[i - 1])
                     ],
                     "bias": random.uniform(-1, 1),
                 }
             )
-        ann.append(layer)
-    return ann
+        layers.append(layer)
+    result = {"structure": structure, "fitness": None, "layers": layers}
+    return result
 
 
 def forward_pass(ann, inputs):
@@ -111,7 +118,7 @@ def forward_pass(ann, inputs):
     until the final output is produced.
     """
     outputs = inputs
-    for layer in ann:
+    for layer in ann["layers"]:
         new_outputs = []
         for node in layer:
             activation = sum_inputs(zip(outputs, node["weights"]))
@@ -127,7 +134,7 @@ def clean_ann(ann):
     Remove the outputs stored in nodes to clean up the ANN, so only the
     weights and biases remain.
     """
-    for layer in ann:
+    for layer in ann["layers"]:
         for node in layer:
             if "output" in node:
                 del node["output"]
@@ -157,14 +164,14 @@ def backpropagate(ann, inputs, expected_outputs, learning_rate=0.1):
 
     # Backpropagate through all layers
     current_errors = output_errors
-    for i in reversed(range(len(ann))):
-        layer = ann[i]
+    for i in reversed(range(len(ann["layers"]))):
+        layer = ann["layers"][i]
 
         # Get inputs to this layer
         if i == 0:
             layer_inputs = inputs
         else:
-            layer_inputs = [node["output"] for node in ann[i - 1]]
+            layer_inputs = [node["output"] for node in ann["layers"][i - 1]]
 
         # Update weights and biases for current layer
         for j, node in enumerate(layer):
@@ -185,7 +192,7 @@ def backpropagate(ann, inputs, expected_outputs, learning_rate=0.1):
         # Calculate errors for previous layer (if not input layer)
         if i > 0:
             new_errors = []
-            previous_layer = ann[i - 1]
+            previous_layer = ann["layers"][i - 1]
             for j in range(len(previous_layer)):
                 error = sum(
                     node["output"]
@@ -241,8 +248,8 @@ def evolve(
     function takes the current population sorted by fitness and generates a
     new population for the next generation. The fitness function takes an
     individual ANN to evaluate and the current population (of siblings), and
-    returns a fitness score that should also be annotated as the node's
-    node["fitness"] value. The halt function takes the current population
+    returns a fitness score that should also be annotated as the network's
+    ann["fitness"] value. The halt function takes the current population
     and generation count to determine if the genetic algorithm should stop.
     The reverse flag indicates if the fittest ANN has the highest (True) or
     lowest (False) fitness score. Finally, the log function can be used to
@@ -302,3 +309,60 @@ def roulette_wheel_selection(population):
             fitness_tally += ann["fitness"]
         if fitness_tally > random_point:
             return ann
+
+
+def crossover(mum, dad):
+    """
+    Perform crossover between two parent ANNs (mum and dad) to create two
+    child ANNs. The children inherit weights and biases from both parents
+    through the following process:
+    
+    1. Two split points are chosen randomly. A split point is always at the
+       boundary between two nodes in a layer.
+    2. The first child inherits weights and biases from the mum up to the first
+       split point, then from the dad until the second split point, and finally
+       from the mum again.
+    3. The second child inherits weights and biases from the dad up to the first
+       split point, then from the mum until the second split point, and finally
+       from the dad again.
+    4. Nodes are treated as a continuous sequence across layers, so the split
+       points can cross layer boundaries.
+    5. The children are returned as a tuple of two new ANN structures.
+    """
+    # Flatten the nodes in both parents to treat them as a continuous sequence.
+    # This makes it easier to choose split points across layers.
+    flat_mum = [node for layer in mum["layers"] for node in layer]
+    flat_dad = [node for layer in dad["layers"] for node in layer]
+
+    # Choose two random split points, ensuring split1 < split2.
+    split1 = random.randint(0, len(flat_mum) - 2)
+    split2 = random.randint(split1 + 1, len(flat_mum) - 1)
+
+    # Create children by slicing and combining parts from both parents.
+    child1 = (
+        flat_mum[:split1] + flat_dad[split1:split2] + flat_mum[split2:]
+    )
+    child2 = (
+        flat_dad[:split1] + flat_mum[split1:split2] + flat_dad[split2:]
+    )
+
+    # Reshape flat children back into ANN expressed as layers.
+    def reshape_to_layers(flat_ann, layers):
+        reshaped = []
+        index = 0
+        for layer_size in layers:
+            reshaped.append(flat_ann[index:index + layer_size])
+            index += layer_size
+        return reshaped
+
+    child1 = {
+        "layers": reshape_to_layers(child1, mum["structure"][1:]),
+        "structure": mum["structure"],
+        "fitness": None,
+    }
+    child2 = {
+        "layers": reshape_to_layers(child2, dad["structure"][1:]),
+        "structure": dad["structure"],
+        "fitness": None,
+    }
+    return child1, child2
