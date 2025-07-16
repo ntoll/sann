@@ -57,7 +57,7 @@ The network is expressed as a dictionary with three attributes:
 
 1. `structure` - a list defining the number of nodes in each layer of the
    network (i.e. what was passed into the `create_network` function to create 
-   it)
+   it).
 2. `fitness` - by default set to `None`, but used during neuro-evolution to
    indicate the arbitrary fitness score of the network during unsupervised
    training.
