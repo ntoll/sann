@@ -14,11 +14,11 @@ This module should work with both [CPython](https://python.org) and
 
 Try a couple of examples of this library in use online via PyScript:
 
-* [Backpropagated numeral recognition](https://pyscript.com/@ntoll/sann-character-recognition/latest)
-  - a neural network that underwent supervised training will categorise hand
+* [Backpropagated numeral recognition](https://pyscript.com/@ntoll/sann-character-recognition/latest) - 
+  a neural network that underwent supervised training will categorise hand
   written numerals from a corpus of unseen test data. ✍️⁉️
-* [Neuro-evolved snake game]()
-  - the classic "SNAKE" game, but played by a neural network that underwent
+* [Neuro-evolved snake game]() - 
+  the classic "SNAKE" game, but played by a neural network that underwent
   unsupervised neuro-evolution to arrive at a player best adapted to the 2D
   world of "SNAKE". It's a snAIke. 🤖🐍
 
