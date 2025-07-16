@@ -104,8 +104,14 @@ def test_backpropagate():
     sann.backpropagate(sample_ann, inputs, expected_outputs)
 
     # Check if weights have been updated (not equal to initial state).
-    assert sample_ann["layers"][0][0]["weights"] != [0.5, 0.2, 0.8]  # Example check.
-    assert sample_ann["layers"][0][0]["bias"] != 0  # Bias should also be updated.
+    assert sample_ann["layers"][0][0]["weights"] != [
+        0.5,
+        0.2,
+        0.8,
+    ]  # Example check.
+    assert (
+        sample_ann["layers"][0][0]["bias"] != 0
+    )  # Bias should also be updated.
 
     # Check if the outputs after backpropagation are different.
     new_outputs = sann.forward_pass(sample_ann, inputs)

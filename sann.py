@@ -312,7 +312,7 @@ def crossover(mum, dad):
     Perform crossover between two parent ANNs (mum and dad) to create two
     child ANNs. The children inherit weights and biases from both parents
     through the following process:
-    
+
     1. Two split points are chosen randomly. A split point is always at the
        boundary between two nodes in a layer.
     2. The first child inherits weights and biases from the mum up to the first
@@ -335,19 +335,15 @@ def crossover(mum, dad):
     split2 = random.randint(split1 + 1, len(flat_mum) - 1)
 
     # Create children by slicing and combining parts from both parents.
-    child1 = (
-        flat_mum[:split1] + flat_dad[split1:split2] + flat_mum[split2:]
-    )
-    child2 = (
-        flat_dad[:split1] + flat_mum[split1:split2] + flat_dad[split2:]
-    )
+    child1 = flat_mum[:split1] + flat_dad[split1:split2] + flat_mum[split2:]
+    child2 = flat_dad[:split1] + flat_mum[split1:split2] + flat_dad[split2:]
 
     # Reshape flat children back into ANN expressed as layers.
     def reshape_to_layers(flat_ann, layers):
         reshaped = []
         index = 0
         for layer_size in layers:
-            reshaped.append(flat_ann[index:index + layer_size])
+            reshaped.append(flat_ann[index : index + layer_size])
             index += layer_size
         return reshaped
 
