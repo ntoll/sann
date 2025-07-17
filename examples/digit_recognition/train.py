@@ -84,7 +84,7 @@ def evaluate_model(ann, test_data):
     """
     correct_predictions = 0
     for pixels, label in test_data:
-        outputs = sann.forward_pass(ann, pixels)
+        outputs = sann.run_network(ann, pixels)
         predicted_label = outputs.index(max(outputs))
         if predicted_label == label:
             correct_predictions += 1

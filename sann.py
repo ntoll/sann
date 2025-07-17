@@ -109,7 +109,7 @@ def create_ann(structure: list) -> dict:
     return result
 
 
-def forward_pass(ann: dict, inputs: list) -> list:
+def run_network(ann: dict, inputs: list) -> list:
     """
     Perform a forward pass through the ANN using the given inputs.
 
@@ -156,7 +156,7 @@ def backpropagate(
     It returns the updated ANN with adjusted weights.
     """
     # Forward pass using existing function (stores outputs in nodes)
-    final_outputs = forward_pass(ann, inputs)
+    final_outputs = run_network(ann, inputs)
 
     # Calculate initial errors for output layer
     output_errors = [

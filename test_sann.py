@@ -59,7 +59,7 @@ def test_forward_pass(sample_ann):
     layer.
     """
     inputs = [0.5, 0.2, 0.8]
-    outputs = sann.forward_pass(sample_ann, inputs)
+    outputs = sann.run_network(sample_ann, inputs)
 
     # Check that the output is a list of length equal to the number
     # of nodes in the output layer
@@ -75,7 +75,7 @@ def test_clean_ann(sample_ann):
     """
     inputs = [0.5, 0.2, 0.8]
     # Perform a forward pass to populate outputs
-    sann.forward_pass(sample_ann, inputs)
+    sann.run_network(sample_ann, inputs)
     # Check that outputs are present before cleaning
     assert "output" in sample_ann["layers"][0][0]
     # Clean the ANN to remove outputs
@@ -98,7 +98,7 @@ def test_backpropagate():
     # Perform a forward pass with sample inputs.
     inputs = [0.5, 0.2, 0.8]
     expected_outputs = [1, 0]  # Expected output for the test.
-    outputs = sann.forward_pass(sample_ann, inputs)
+    outputs = sann.run_network(sample_ann, inputs)
 
     # Perform backpropagation.
     sann.backpropagate(sample_ann, inputs, expected_outputs)
@@ -114,7 +114,7 @@ def test_backpropagate():
     )  # Bias should also be updated.
 
     # Check if the outputs after backpropagation are different.
-    new_outputs = sann.forward_pass(sample_ann, inputs)
+    new_outputs = sann.run_network(sample_ann, inputs)
     # Outputs should change after backpropagation.
     assert new_outputs != outputs
     # Outputs should still be valid.
