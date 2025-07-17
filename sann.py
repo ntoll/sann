@@ -36,7 +36,7 @@ import random
 from functools import partial
 
 
-def sum_inputs(inputs):
+def sum_inputs(inputs: list[tuple[float, float]]) -> float:
     """
     Calculate the activation value from a list of pairs of "x" input values
     and "w" weights. This is essentially just the dot product.
@@ -44,7 +44,7 @@ def sum_inputs(inputs):
     return sum([x * w for x, w in inputs])
 
 
-def sigmoid(a, t=0, r=0.5):
+def sigmoid(a: float, t: float = 0.0, r: float = 0.5) -> float:
     """
     Calculate the output value of a sigmoid based node.
 
@@ -55,7 +55,7 @@ def sigmoid(a, t=0, r=0.5):
     return 1 / (1 + math.exp(-((a - t) / r)))
 
 
-def tlu(a, t=0):
+def tlu(a: int | float, t: int | float = 0) -> int:
     """
     Calculate the output value of a threshold logic unit (TLU).
 
@@ -65,7 +65,7 @@ def tlu(a, t=0):
     return 1 if a >= t else 0
 
 
-def create_ann(structure):
+def create_ann(structure: list) -> dict:
     """
     Return a dict representing a simple artificial neural network (ANN).
 
@@ -109,7 +109,7 @@ def create_ann(structure):
     return result
 
 
-def forward_pass(ann, inputs):
+def forward_pass(ann: dict, inputs: list) -> list:
     """
     Perform a forward pass through the ANN using the given inputs.
 
@@ -129,7 +129,7 @@ def forward_pass(ann, inputs):
     return outputs
 
 
-def clean_ann(ann):
+def clean_ann(ann: dict) -> dict:
     """
     Remove the outputs stored in nodes to clean up the ANN, so only the
     weights and biases remain.
@@ -141,7 +141,9 @@ def clean_ann(ann):
     return ann
 
 
-def backpropagate(ann, inputs, expected_outputs, learning_rate=0.1):
+def backpropagate(
+    ann: dict, inputs: list, expected_outputs: list, learning_rate: float = 0.1
+) -> dict:
     """
     Perform backpropagation to adjust the weights of the ANN based on the
     expected outputs.
@@ -208,7 +210,11 @@ def backpropagate(ann, inputs, expected_outputs, learning_rate=0.1):
 
 
 def train(
-    ann, training_data, epochs=1000, learning_rate=0.1, log=lambda x: None
+    ann: dict,
+    training_data: list[tuple[list[float], list[float]]],
+    epochs: int = 1000,
+    learning_rate: float = 0.1,
+    log=lambda x: None,
 ):
     """
     Supervised training of the ANN using the provided training data.
@@ -231,12 +237,12 @@ def train(
 
 
 def evolve(
-    layers,
-    population,
-    generate,
-    fitness,
-    halt,
-    reverse=True,
+    layers: list[int],
+    population: int,
+    generate: callable,
+    fitness: callable,
+    halt: callable,
+    reverse: bool = True,
     log=lambda x: None,
 ):
     """
@@ -282,7 +288,7 @@ def evolve(
     return current_population
 
 
-def roulette_wheel_selection(population):
+def roulette_wheel_selection(population: list[dict]) -> dict:
     """
     A random number between 0 and the total fitness score of all the ANNs in
     a population is chosen (a point with a slice of a roulette wheel). The code
@@ -307,7 +313,7 @@ def roulette_wheel_selection(population):
             return ann
 
 
-def crossover(mum, dad):
+def crossover(mum: dict, dad: dict) -> tuple[dict, dict]:
     """
     Perform crossover between two parent ANNs (mum and dad) to create two
     child ANNs. The children inherit weights and biases from both parents

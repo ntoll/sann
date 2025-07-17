@@ -16,5 +16,3 @@ import json
 import sann
 from snake import SnakeWorld
 from rich.progress import Progress
-
-
