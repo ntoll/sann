@@ -186,12 +186,27 @@ This is achieved
 ### Use the network 🛠️⚙️✅
 
 Given a representation of a trained or evolved neural network and a list of
-input values, use the `forward_pass` function to retrieve a list of output 
+input values, use the `run_network` function to retrieve a list of output 
 values caused by passing the inputs through the neural network.
 
 That's it!
 
 ```python
+import sann
+
+
+# Load the pre-trained neural network from somewhere.
+with open("my_nn.json", "r") as f:
+  nn = json.load(f)
+
+# Get the input data from somewhere.
+input_data = get_input_data_from_somewhere()
+
+# Gather the result by running input data through the network.
+result = sann.run_network(nn, input_data)
+
+# Interpret / react to the result in some meaningful manner.
+do_stuff_with(result)
 ```
 
 ## Developer Setup 💻🧑‍💻
