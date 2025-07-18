@@ -115,7 +115,7 @@ The network is expressed as a dictionary with three attributes:
 }
 ```
 
-### Training
+### Training 🎓
 
 Training is the process through which the artificial neural network, created
 with randomly generated weights and biases, is modified and refined so that 
