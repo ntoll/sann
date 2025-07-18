@@ -114,6 +114,8 @@ The network is expressed as a dictionary with three attributes:
 }
 ```
 
+The representation of the neural network is designed to be JSON serializable.
+
 ### Training 🎓
 
 Training is the process through which the artificial neural network, created
