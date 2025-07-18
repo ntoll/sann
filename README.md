@@ -72,8 +72,8 @@ The network is expressed as a dictionary with three attributes:
   "structure": [2, 3, 1],
   "fitness": None,
   "layers": [
-  # No definition of the input layer needed, because its values are the raw 
-  # input data
+    # No definition of the input layer needed, because its values are the raw 
+    # input data
     [ # Hidden layer. Each hidden node has a bias and
       # two input weights: one each from the nodes in
       # the input layer.
