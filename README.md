@@ -19,8 +19,7 @@ Try a couple of examples of this library in use online via PyScript:
   written numerals from a corpus of unseen test data. ✍️⁉️
 * [Neuro-evolved snake game]() - 
   the classic "SNAKE" game, but played by a neural network that underwent
-  unsupervised neuro-evolution to arrive at a player best adapted to the 2D
-  world of "SNAKE". It's a snAIke. 🤖🐍
+  unsupervised neuro-evolution. It's a snAIke. 🤖🐍
 
 ## Installation 📦
 
