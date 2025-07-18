@@ -39,6 +39,9 @@ class SnakeWorld:
         """
         Move the game state forward by one tick of the clock.
         """
+        if not self.alive:
+            # The snake is dead. Poor old snake.
+            return
         # Move the snake.
         new_head = (
             self.snake[0][0] + self.snake_direction[0],
