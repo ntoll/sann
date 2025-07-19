@@ -3,6 +3,7 @@ clean:
 	rm -rf .coverage
 	rm -rf .pytest_cache
 	rm -rf examples/digit_recognition/nn.json
+	rm -rf examples/snaike/fittest_ann.json
 	rm -rf examples/snaike/nn.json
 	find . | grep -E "(__pycache__)" | xargs rm -rf
 
