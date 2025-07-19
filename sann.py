@@ -33,7 +33,6 @@ SOFTWARE.
 
 import math
 import random
-from functools import partial
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
@@ -214,7 +213,7 @@ def train(
     training_data: list[tuple[list[float], list[float]]],
     epochs: int = 1000,
     learning_rate: float = 0.1,
-    log=lambda x: None,
+    log: callable = lambda x: None,
 ):
     """
     Supervised training of the ANN using the provided training data.
@@ -236,63 +235,14 @@ def train(
     return ann
 
 
-def evolve(
-    layers: list[int],
-    population: int,
-    generate: callable,
-    fitness: callable,
-    halt: callable,
-    reverse: bool = True,
-    log=lambda x: None,
-):
-    """
-    Evolve a population of ANNs using a genetic algorithm.
-
-    The layers define the topology of the ANNs as a list of layer sizes (as
-    per the create_ann function in this module). The population should be an
-    integer defining the number of ANNs in each generation. The generate
-    function takes the current population sorted by fitness and generates a
-    new population for the next generation. The fitness function takes an
-    individual ANN to evaluate and the current population (of siblings), and
-    returns a fitness score that should also be annotated as the network's
-    ann["fitness"] value. The halt function takes the current population
-    and generation count to determine if the genetic algorithm should stop.
-    The reverse flag indicates if the fittest ANN has the highest (True) or
-    lowest (False) fitness score. Finally, the log function can be used to
-    log each generation during the course of evolution. It defaults to a
-    no-op function that does nothing.
-
-    When the genetic algorithm halts, it returns the final population
-    ordered by fitness.
-    """
-    # Create initial population
-    seed_generation = [create_ann(layers) for _ in range(population)]
-    # Sort it by fitness
-    current_population = sorted(
-        seed_generation,
-        key=partial(fitness, population=seed_generation),
-        reverse=reverse,
-    )
-    generation_count = 0
-    log(current_population)
-    # Keep evolving until the halt function returns True.
-    while not halt(current_population, generation_count):
-        generation_count += 1
-        new_generation = generate(current_population)
-        current_population = sorted(
-            new_generation,
-            key=partial(fitness, population=new_generation),
-            reverse=True,
-        )
-        log(current_population)
-    return current_population
-
-
 def roulette_wheel_selection(population: list[dict]) -> dict:
     """
+    Select a neural network from the population, with the fittest networks
+    having a higher chance of being selected.
+
     A random number between 0 and the total fitness score of all the ANNs in
-    a population is chosen (a point with a slice of a roulette wheel). The code
-    iterates through the ANNs adding up the fitness scores. When the
+    a population is chosen (a point within a slice of a roulette wheel). The
+    code iterates through the ANNs adding up the fitness scores. When the
     subtotal is greater than the randomly chosen point it returns the ANN
     at that point "on the wheel".
 
@@ -345,7 +295,9 @@ def crossover(mum: dict, dad: dict) -> tuple[dict, dict]:
     child2 = flat_dad[:split1] + flat_mum[split1:split2] + flat_dad[split2:]
 
     # Reshape flat children back into ANN expressed as layers.
-    def reshape_to_layers(flat_ann, layers):
+    def reshape_to_layers(
+        flat_ann: list, layers: list[int]
+    ) -> list[list[dict]]:
         reshaped = []
         index = 0
         for layer_size in layers:
@@ -364,3 +316,139 @@ def crossover(mum: dict, dad: dict) -> tuple[dict, dict]:
         "fitness": None,
     }
     return child1, child2
+
+
+def mutate(
+    ann: dict, mutation_chance: float = 0.01, mutation_amount: float = 0.1
+) -> dict:
+    """
+    Mutate the ANN by randomly adjusting weights and biases. Return the
+    mutated ANN.
+
+    The mutation_chance determines the likelihood of each weight or bias being
+    mutated. A higher mutation_chance means more frequent changes.
+
+    The randomly selected weight or bias has its value changed by a small
+    random amount within the -/+ mutation_amount range.
+    """
+    for layer in ann["layers"]:
+        for node in layer:
+            # Mutate weights
+            for i in range(len(node["weights"])):
+                if random.random() < mutation_chance:
+                    node["weights"][i] += random.uniform(
+                        -mutation_amount, mutation_amount
+                    )
+            # Mutate bias
+            if random.random() < mutation_chance:
+                node["bias"] += random.uniform(
+                    -mutation_amount, mutation_amount
+                )
+    return ann
+
+
+def simple_generate(
+    old_population: list[dict],
+    fittest_proportion: float = 0.5,
+    mutation_chance: float = 0.01,
+    mutation_amount: float = 0.1,
+) -> list[dict]:
+    """
+    Generate a new population of ANNs by performing crossover and mutation
+    on the old_population.
+
+    The new population is created by selecting the fittest ANNs from the
+    old_population. The fittest proportion is defined by the
+    fittest_proportion argument, where 0.5 means half of the old_population
+    is used as parents.
+
+    The new_population is filled with children created from pairs of parents
+    selected using roulette wheel selection. Each pair of parents undergoes
+    crossover to produce two children, which are then mutated. The new
+    population is returned, which should be the same size as the
+    old_population.
+    """
+    old_length = len(old_population)
+    # Select the fittest proportion of the old_population as parents.
+    split_index = int(old_length * fittest_proportion)
+    parents = old_population[:split_index]
+    new_population = parents.copy()
+    # Fill in the rest of the new_population with children created from the
+    # fittest parents of the old_population.
+    while len(new_population) < old_length:
+        mum = roulette_wheel_selection(parents)
+        dad = roulette_wheel_selection(parents)
+        child1, child2 = crossover(mum, dad)
+        new_population.append(mutate(child1, mutation_chance, mutation_amount))
+        new_population.append(mutate(child2, mutation_chance, mutation_amount))
+    return new_population[:old_length]
+
+
+def evolve(
+    layers: list[int],
+    population_size: int,
+    fitness_function: callable,
+    halt_function: callable,
+    generate_function: callable = simple_generate,
+    fittest_proportion: float = 0.5,
+    mutation_chance: float = 0.01,
+    mutation_amount: float = 0.1,
+    reverse: bool = True,
+    log: callable = lambda x: None,
+):
+    """
+    Evolve a population of ANNs using a genetic algorithm.
+
+    The layers define the topology of the ANNs as a list of layer sizes (as
+    per the create_ann function in this module). The population_size is an
+    integer defining the number of ANNs in each generation.
+
+    The generate_function should take a list of the current population
+    sorted by fitness, along with the optional fittest_proportion that
+    determines the proportion of the fittest individuals to retain. The
+    mutation_chance, and mutation_amount parameters are used to control
+    the mutation process. The generate_function returns a new unsorted
+    population for the next generation.
+
+    The fitness function takes an individual ANN to evaluate and the current
+    population (of siblings), and returns a fitness score that is annotated
+    as the network's ann["fitness"] value. The halt function takes the
+    current population and generation count to determine if the genetic
+    algorithm should stop. The reverse flag indicates if the fittest ANN
+    has the highest (True) or lowest (False) fitness score. Finally, the
+    log function can be used to log each generation during the course of
+    evolution. It defaults to a no-op function that does nothing.
+
+    When the genetic algorithm halts, it returns the final population
+    ordered by fitness.
+    """
+    # Create initial population
+    seed_generation = [create_ann(layers) for _ in range(population_size)]
+    # Sort it by fitness
+    for ann in seed_generation:
+        ann["fitness"] = fitness_function(ann, seed_generation)
+    current_population = sorted(
+        seed_generation,
+        key=lambda ann: ann["fitness"],
+        reverse=reverse,
+    )
+    generation_count = 0
+    log(current_population)
+    # Keep evolving until the halt function returns True.
+    while not halt_function(current_population, generation_count):
+        generation_count += 1
+        new_generation = generate_function(
+            current_population,
+            fittest_proportion,
+            mutation_chance,
+            mutation_amount,
+        )
+        for ann in new_generation:
+            ann["fitness"] = fitness_function(ann, new_generation)
+        current_population = sorted(
+            new_generation,
+            key=lambda ann: ann["fitness"],
+            reverse=reverse,
+        )
+        log(current_population)
+    return current_population

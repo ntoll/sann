@@ -1,3 +1,28 @@
+"""
+A naive implementation of a simple snake game world. Used to test the
+neural network's ability to learn how to play the game.
+
+Copyright (c) 2025 Nicholas H.Tollervey (ntoll@ntoll.org).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 import random
 
 
@@ -15,7 +40,8 @@ class SnakeWorld:
     The snake's direction is represented as a tuple, where the first item
     is the horizontal direction (-1 for left, 0 for no movement, 1 for right)
     and the second item is the vertical direction (-1 for up, 0 for no
-    movement, 1 for down).
+    movement, 1 for down). The snake cannot move in the opposite direction
+    to its current movement.
 
     The draw method is not implemented here, as it is expected to be
     implemented in a subclass that handles the rendering of the game.
@@ -62,6 +88,7 @@ class SnakeWorld:
                 random.randint(1, 39),
                 random.randint(1, 39),
             )  # New food position.
+            self.on_food()
         else:
             # Remove tail segment if no food eaten.
             self.snake.pop()
@@ -72,25 +99,36 @@ class SnakeWorld:
         """
         Change the snake's direction to up.
         """
-        self.snake_direction = (0, -1)
+        if self.snake_direction != (0, 1):
+            self.snake_direction = (0, -1)
 
     def move_down(self):
         """
         Change the snake's direction to down.
         """
-        self.snake_direction = (0, 1)
+        if self.snake_direction != (0, -1):
+            self.snake_direction = (0, 1)
 
     def move_left(self):
         """
         Change the snake's direction to left.
         """
-        self.snake_direction = (-1, 0)
+        if self.snake_direction != (1, 0):
+            self.snake_direction = (-1, 0)
 
     def move_right(self):
         """
         Change the snake's direction to right.
         """
-        self.snake_direction = (1, 0)
+        if self.snake_direction != (-1, 0):
+            self.snake_direction = (1, 0)
+
+    def on_food(self):
+        """
+        Called when the snake eats food. This method can be overridden
+        to implement custom behavior when food is eaten.
+        """
+        pass
 
     def draw(self):
         """

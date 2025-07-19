@@ -1,5 +1,25 @@
 """
 Test file for the sann package, using PyTest.
+
+Copyright (c) 2025 Nicholas H.Tollervey (ntoll@ntoll.org).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 """
 
 import sann
@@ -183,3 +203,118 @@ def test_crossover():
     assert len(child2["layers"]) == len(dad["layers"])
     for layer in child1["layers"] + child2["layers"]:
         assert all("weights" in node and "bias" in node for node in layer)
+
+
+def test_mutate():
+    """
+    Test the mutation function for randomly adjusting weights and biases of an ANN.
+    """
+    # Create a sample ANN.
+    ann = sann.create_ann([3, 5, 2])
+
+    # Store original weights and biases for comparison.
+    original_weights = [
+        node["weights"] for layer in ann["layers"] for node in layer
+    ]
+    original_biases = [
+        node["bias"] for layer in ann["layers"] for node in layer
+    ]
+
+    # Perform mutation and set the mutation_chance to 1.0 for testing. All weights
+    # and biases should change.
+    mutated_ann = sann.mutate(ann, mutation_chance=1.0)
+
+    # Check that at least one weight or bias has changed.
+    assert any(
+        original != mutated
+        for original, mutated in zip(
+            original_weights,
+            [
+                node["weights"]
+                for layer in mutated_ann["layers"]
+                for node in layer
+            ],
+        )
+    ) or any(
+        original != mutated
+        for original, mutated in zip(
+            original_biases,
+            [
+                node["bias"]
+                for layer in mutated_ann["layers"]
+                for node in layer
+            ],
+        )
+    )
+
+
+def test_simple_generate():
+    """
+    Test the simple_generate function for creating a new population of ANNs.
+    """
+    old_population = [sann.create_ann([3, 5, 2]) for _ in range(10)]
+    # Create test fitness values for the old population.
+    for ann in old_population:
+        ann["fitness"] = random.uniform(0, 1)
+    # Generate the new population from the old.
+    new_population = sann.simple_generate(
+        old_population, fittest_proportion=0.5
+    )
+    # Check that the new population is the same size as the old population.
+    assert len(new_population) == len(old_population)
+    # Check that the new population is not the same as the old population.
+    assert new_population != old_population
+
+
+def test_evolve():
+    """
+    Ensure the process of evolving a population of ANNs proceeds in the
+    expected manner.
+
+    This test ONLY checks that the evolution process runs without errors.
+    It does not validate the correctness of the evolution logic (supplied
+    by the developer).
+    """
+
+    def fitness_function(ann, current_population):
+        """
+        This function merely sums the network's weights and bias to determine
+        its "fitness", for testing purposes. This is an arbitrarily stupid
+        fitness function that should be replaced with a more meaningful one.
+        """
+        return sum(
+            sum(node["weights"]) + node["bias"]
+            for layer in ann["layers"]
+            for node in layer
+        )
+
+    def halt(current_population, generation_count):
+        """
+        Determine if the evolution process should halt.
+        This is a mock function for testing purposes.
+        """
+        return generation_count == 10  # Halt after 10 generations
+
+    log = MagicMock()
+
+    result = sann.evolve(
+        layers=[3, 5, 2],
+        population_size=10,
+        fitness_function=fitness_function,
+        halt_function=halt,
+        log=log,
+    )
+
+    # The log function should be called.
+    log.assert_called()
+    # Check that the result is a list of ANNs.
+    assert isinstance(result, list)
+    # The length of the result should be equal to the population size.
+    assert len(result) == 10
+    # Each ANN in the result has a fitness value.
+    assert all("fitness" in ann for ann in result)
+    # The order of the result is based on fitness.
+    assert all(
+        result[i]["fitness"] >= result[i + 1]["fitness"]
+        for i in range(len(result) - 1)
+    )
