@@ -27,12 +27,12 @@ extra_css:
   - assets/style.css
 
 nav:
-  - User Guide: index.md
-  - Examples:
-      - Digit Recognition: examples/digit_recognition/index.md
-      - snAIke: examples/snaike/index.md
-  - API: api.md
-  - Care of Community: CARE_OF_COMMUNITY.md
-  - Changelog: changelog.md
-  - License: license.md
+  - User Guide 📖: index.md
+  - Examples 🤖:
+      - Digit Recognition ✍️: examples/digit_recognition/index.md
+      - snAIke 🐍: examples/snaike/index.md
+  - API 💻: api.md
+  - Care of Community ❤️: CARE_OF_COMMUNITY.md
+  - Changelog 📜: changelog.md
+  - License ⚖️: license.md
 

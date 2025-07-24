@@ -124,3 +124,8 @@ sann.min.py
 # Docs build output
 docs/site/
 docs/docs/
+
+# Copy of sann.py for examples and docs
+examples/digit_recognition/web/sann.py
+examples/snaike/web/sann.py
+docs/sann.py

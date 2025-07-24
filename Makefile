@@ -8,6 +8,9 @@ clean:
 	rm -rf docs/docs/*
 	rm -rf docs/site
 	rm -rf sann.min.py
+	rm -rf examples/digit_recognition/web/sann.py
+	rm -rf examples/snaike/web/sann.py
+	rm -rf docs/sann.py
 	find . | grep -E "(__pycache__)" | xargs rm -rf
 
 docs: clean
