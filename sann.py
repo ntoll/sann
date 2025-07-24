@@ -133,7 +133,7 @@ def run_network(ann: dict, inputs: list) -> list:
 
 def clean_ann(ann: dict) -> dict:
     """
-    Remove the outputs stored in nodes to clean up the ANN, so only the
+    Remove the outputs stored in nodes to clean up the `ann`, so only the
     weights and biases remain.
     """
     for layer in ann["layers"]:
