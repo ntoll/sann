@@ -1,5 +1,5 @@
 """
-Simple Artificial Neural Network (sann.py).
+Simple Artificial Neural Networks (sann.py).
 
 A naive Python implementation of an ANN that's useful for educational purposes
 and clarifying the concepts of feed-forward neural networks, backpropagation,
@@ -40,8 +40,8 @@ __version__ = "0.1.0"
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
     """
-    Calculate the activation value from a list of pairs of "x" input values
-    and "w" weights. This is essentially just the dot product.
+    Calculate the activation value from a list of pairs of `x` input values
+    and `w` weights. This is essentially just the dot product.
     """
     return sum([x * w for x, w in inputs])
 
@@ -50,8 +50,8 @@ def sigmoid(a: float, t: float = 0.0, r: float = 0.5) -> float:
     """
     Calculate the output value of a sigmoid based node.
 
-    Take the activation value "a", a threshold value "t", and a shape parameter
-    "r", and return the output value found somewhere on an s-shaped sigmoid
+    Take the activation value `a`, a threshold value `t`, and a shape parameter
+    `r`, and return the output value found somewhere on an s-shaped sigmoid
     curve.
     """
     return 1 / (1 + math.exp(-((a - t) / r)))
@@ -61,8 +61,8 @@ def tlu(a: int | float, t: int | float = 0) -> int:
     """
     Calculate the output value of a threshold logic unit (TLU).
 
-    If the activation (a) is greater than the threshold (t), set the output to
-    1 (truthy), else set it to 0 (falsey).
+    If the activation (`a`) is greater than the threshold (`t`), set the output
+    to `1` (truthy), else set it to `0` (falsey).
     """
     return 1 if a >= t else 0
 
@@ -71,7 +71,7 @@ def create_ann(structure: list) -> dict:
     """
     Return a dict representing a simple artificial neural network (ANN).
 
-    The structure argument should be a list containing the number of nodes in
+    The `structure` argument should be a list containing the number of nodes in
     each layer of a fully connected feed-forward neural network.
 
     The resulting dictionary will contain a list of layers, where each layer
@@ -84,8 +84,8 @@ def create_ann(structure: list) -> dict:
     layer and an output layer) for the ANN to be valid.
 
     Other arbitrary arbitrary properties can be added to the returned
-    dictionary, such as a fitness score, which can be used for training or
-    evolution of the ANN, and a structure that defines the topology of the
+    dictionary, such as a `fitness` score, which can be used for training or
+    evolution of the ANN, and a `structure` that defines the topology of the
     ANN (i.e. the number of nodes in each layer).
     """
     if len(structure) < 2:
@@ -113,7 +113,7 @@ def create_ann(structure: list) -> dict:
 
 def run_network(ann: dict, inputs: list) -> list:
     """
-    Perform a forward pass through the ANN using the given inputs.
+    Perform a forward pass through the `ann` using the given `inputs`.
 
     The inputs are a list of values that are fed into the first layer of the
     ANN. The output of each layer is calculated and passed to the next layer
@@ -147,53 +147,53 @@ def backpropagate(
     ann: dict, inputs: list, expected_outputs: list, learning_rate: float = 0.1
 ) -> dict:
     """
-    Perform backpropagation to adjust the weights of the ANN based on the
-    expected outputs.
+    Perform backpropagation to adjust the weights of the `ann` based on the
+    `expected_outputs`.
 
     This function calculates the error for each node in the output layer,
     propagates that error back through the network, and adjusts the weights
-    accordingly. The learning rate determines how much the weights are
+    accordingly. The `learning_rate` determines how much the weights are
     adjusted during each update.
 
     It returns the updated ANN with adjusted weights.
     """
-    # Forward pass using existing function (stores outputs in nodes)
+    # Forward pass using existing function (stores outputs in nodes).
     final_outputs = run_network(ann, inputs)
 
-    # Calculate initial errors for output layer
+    # Calculate initial errors for output layer.
     output_errors = [
         expected - actual
         for expected, actual in zip(expected_outputs, final_outputs)
     ]
 
-    # Backpropagate through all layers
+    # Backpropagate through all layers.
     current_errors = output_errors
     for i in reversed(range(len(ann["layers"]))):
         layer = ann["layers"][i]
 
-        # Get inputs to this layer
+        # Get inputs to this layer.
         if i == 0:
             layer_inputs = inputs
         else:
             layer_inputs = [node["output"] for node in ann["layers"][i - 1]]
 
-        # Update weights and biases for current layer
+        # Update weights and biases for current layer.
         for j, node in enumerate(layer):
-            # Calculate gradient using this node's stored output
+            # Calculate gradient using this node's stored output.
             gradient = (
                 node["output"] * (1 - node["output"]) * current_errors[j]
             )
 
-            # Update weights using inputs to this layer
+            # Update weights using inputs to this layer.
             for k in range(len(node["weights"])):
                 node["weights"][k] += (
                     learning_rate * gradient * layer_inputs[k]
                 )
 
-            # Update bias
+            # Update bias.
             node["bias"] += learning_rate * gradient
 
-        # Calculate errors for previous layer (if not input layer)
+        # Calculate errors for previous layer (if not input layer).
         if i > 0:
             new_errors = []
             previous_layer = ann["layers"][i - 1]
@@ -219,13 +219,14 @@ def train(
     log: callable = lambda x: None,
 ):
     """
-    Supervised training of the ANN using the provided training data.
+    Supervised training of the `ann` using the provided `training_data`.
 
-    The training data is a list of tuples where each tuple contains inputs and
-    the expected output. The ANN is trained for a specified number of epochs,
-    adjusting the weights based on the error between actual and expected outputs.
+    The `training_data` is a list of tuples where each tuple contains inputs and
+    the expected output. The ANN is trained for a specified number of `epochs`,
+    adjusting the weights by the `learning_rate`, and based on the error
+    between actual and expected outputs.
 
-    The log function can be used to log progress during training. It defaults
+    The `log` function can be used to log progress during training. It defaults
     to a no-op function that does nothing.
     """
     log("Training ANN...")
@@ -240,7 +241,7 @@ def train(
 
 def roulette_wheel_selection(population: list[dict]) -> dict:
     """
-    Select a neural network from the population, with the fittest networks
+    Select a neural network from the `population`, with the fittest networks
     having a higher chance of being selected.
 
     A random number between 0 and the total fitness score of all the ANNs in
@@ -268,18 +269,18 @@ def roulette_wheel_selection(population: list[dict]) -> dict:
 
 def crossover(mum: dict, dad: dict) -> tuple[dict, dict]:
     """
-    Perform crossover between two parent ANNs (mum and dad) to create two
+    Perform crossover between two parent ANNs (`mum` and `dad`) to create two
     child ANNs. The children inherit weights and biases from both parents
     through the following process:
 
     1. Two split points are chosen randomly. A split point is always at the
        boundary between two nodes in a layer.
-    2. The first child inherits weights and biases from the mum up to the first
-       split point, then from the dad until the second split point, and finally
-       from the mum again.
-    3. The second child inherits weights and biases from the dad up to the first
-       split point, then from the mum until the second split point, and finally
-       from the dad again.
+    2. The first child inherits weights and biases from the `mum` up to the
+       first split point, then from the `dad` until the second split point,
+       and finally from the `mum` again.
+    3. The second child inherits weights and biases from the `dad` up to the
+       first split point, then from the `mum` until the second split point,
+       and finally from the `dad` again.
     4. Nodes are treated as a continuous sequence across layers, so the split
        points can cross layer boundaries.
     5. The children are returned as a tuple of two new ANN structures.
@@ -325,14 +326,14 @@ def mutate(
     ann: dict, mutation_chance: float = 0.01, mutation_amount: float = 0.1
 ) -> dict:
     """
-    Mutate the ANN by randomly adjusting weights and biases. Return the
+    Mutate the `ann` by randomly adjusting weights and biases. Return the
     mutated ANN.
 
-    The mutation_chance determines the likelihood of each weight or bias being
-    mutated. A higher mutation_chance means more frequent changes.
+    The `mutation_chance` determines the likelihood of each weight or bias
+    being mutated. A higher `mutation_chance` means more frequent changes.
 
     The randomly selected weight or bias has its value changed by a small
-    random amount within the -/+ mutation_amount range.
+    random amount within the -/+ `mutation_amount` range.
     """
     for layer in ann["layers"]:
         for node in layer:
@@ -358,18 +359,22 @@ def simple_generate(
 ) -> list[dict]:
     """
     Generate a new population of ANNs by performing crossover and mutation
-    on the old_population.
+    on the `old_population`.
 
     The new population is created by selecting the fittest ANNs from the
-    old_population. The fittest proportion is defined by the
-    fittest_proportion argument, where 0.5 means half of the old_population
-    is used as parents.
+    `old_population`. The fittest proportion is defined by the
+    `fittest_proportion` argument, where 0.5 means half of the
+    `old_population` is used as parents.
 
-    The new_population is filled with children created from pairs of parents
+    The new population is filled with children created from pairs of parents
     selected using roulette wheel selection. Each pair of parents undergoes
     crossover to produce two children, which are then mutated. The new
     population is returned, which should be the same size as the
-    old_population.
+    `old_population`.
+
+    The `mutation_chance` and `mutation_amount` parameters control the
+    mutation process for the children and are passed to the `mutate`
+    function.
     """
     old_length = len(old_population)
     # Select the fittest proportion of the old_population as parents.
@@ -402,26 +407,26 @@ def evolve(
     """
     Evolve a population of ANNs using a genetic algorithm.
 
-    The layers define the topology of the ANNs as a list of layer sizes (as
-    per the create_ann function in this module). The population_size is an
+    The `layers` define the topology of the ANNs as a list of layer sizes (as
+    per the `create_ann` function in this module). The `population_size` is an
     integer defining the number of ANNs in each generation.
 
-    The fitness function takes an individual ANN to evaluate and the current
+    The `fitness_function` takes an individual ANN to evaluate and the current
     population (of siblings), and returns a fitness score that is annotated
-    as the network's ann["fitness"] value. The halt function takes the
+    as the network's `ann["fitness"]` value. The `halt_function` takes the
     current population and generation count to determine if the genetic
     algorithm should stop.
 
-    The generate_function should take a list of the current population
-    sorted by fitness, along with the optional fittest_proportion that
+    The `generate_function` should take a list of the current population
+    sorted by fitness, along with the optional `fittest_proportion` that
     determines the proportion of the fittest individuals to retain. The
-    mutation_chance, and mutation_amount parameters are used to control
-    the mutation process. The generate_function returns a new unsorted
+    `mutation_chance`, and `mutation_amount` parameters are used to control
+    the mutation process. The `generate_function` returns a new unsorted
     population for the next generation.
 
-    The reverse flag indicates if the fittest ANN has the highest (True) or
-    lowest (False) fitness score. Finally, the log function can be used to
-    log each generation during the course of evolution. It defaults to a
+    The `reverse` flag indicates if the fittest ANN has the highest (`True`)
+    or lowest (`False`) fitness score. Finally, the `log` function can be used
+    to log each generation during the course of evolution. It defaults to a
     no-op function that does nothing.
 
     When the genetic algorithm halts, it returns the final population
