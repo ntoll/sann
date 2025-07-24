@@ -35,7 +35,7 @@ import math
 import random
 
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
