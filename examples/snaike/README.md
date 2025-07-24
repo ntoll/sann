@@ -1,7 +1,11 @@
 # SnAIke
 
-Unsupervised training (via evolution) of a neural network that controls a
-snake looking for food in a simple 2d game world.
+This project is an example of unsupervised training (via evolution) of 
+a neural network that controls a snake looking for food in a simple 2d
+game world. Use the arrow keys to change the direction of the snake, or
+click on the `[]`🤖 checkbox to toggle the neuro-evolved AI autopilot.
+
+[Play the game here.](./web/index.html).
 
 The network (ANN) receives 8 inputs representing the game state:
 

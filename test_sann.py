@@ -1,6 +1,9 @@
 """
 Test file for the sann package, using PyTest.
 
+To run the tests, in your virtual environment with all the requirements
+installed, use the command: make check
+
 Copyright (c) 2025 Nicholas H.Tollervey (ntoll@ntoll.org).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of

@@ -116,3 +116,11 @@ venv.bak/
 
 # Training output
 examples/digit_recognition/nn.json
+examples/snaike/fittest_ann.json
+
+# Minified files
+sann.min.py
+
+# Docs build output
+docs/site/
+docs/docs/

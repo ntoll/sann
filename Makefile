@@ -5,7 +5,30 @@ clean:
 	rm -rf examples/digit_recognition/nn.json
 	rm -rf examples/snaike/fittest_ann.json
 	rm -rf examples/snaike/nn.json
+	rm -rf docs/docs/*
+	rm -rf docs/site
+	rm -rf sann.min.py
 	find . | grep -E "(__pycache__)" | xargs rm -rf
+
+docs: clean
+	cp sann.py examples/digit_recognition/web/
+	cp sann.py examples/snaike/web/
+	cp sann.py docs/
+	mkdir -p docs/docs/assets
+	cp assets/*.svg docs/docs/assets/
+	cp assets/style.css docs/docs/assets/
+	cp assets/api.md docs/docs/
+	cp README.md docs/docs/index.md
+	cp LICENSE.md docs/docs/license.md
+	cp CHANGELOG.md docs/docs/changelog.md
+	cp CARE_OF_COMMUNITY.md docs/docs/CARE_OF_COMMUNITY.md
+	mkdir -p docs/docs/examples/digit_recognition
+	cp -r examples/digit_recognition/* docs/docs/examples/digit_recognition/
+	mv docs/docs/examples/digit_recognition/README.md docs/docs/examples/digit_recognition/index.md
+	mkdir -p docs/docs/examples/snaike
+	cp -r examples/snaike/* docs/docs/examples/snaike/
+	mv docs/docs/examples/snaike/README.md docs/docs/examples/snaike/index.md
+	cd docs && mkdocs build --clean
 
 tidy:
 	black -l 79 *.py
@@ -18,10 +41,13 @@ test:
 check: clean tidy test
 
 dist: check
-	python3 setup.py sdist
+	python3 -m build
 
 publish-test: dist
 	twine upload -r test --sign dist/*
 
 publish: dist
 	twine upload --sign dist/*
+
+minify: check
+	pyminify --remove-literal-statements sann.py --output sann.min.py

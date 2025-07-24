@@ -5,6 +5,8 @@ networks allow computers to do character recognition. Put simply, this
 project trains a neural network to recognise the digits 0-9 from 
 handwritten input.
 
+[See the network categorize digits here.](./web/index.html).
+
 The data used for training and testing is contained in the 
 `optdigits.tra` (training) and `optdigits.tes` (testing) files. The
 `optdigits.names` file contains a description of the size and shape of

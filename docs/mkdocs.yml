@@ -1,0 +1,38 @@
+site_name: Simple Artificial Neural Networks (SANN)
+theme: 
+  name: material
+  logo: assets/logo_white.svg
+  features:
+        - content.code.copy
+        - content.code.annotate
+
+plugins:
+- search
+- mkdocstrings
+
+markdown_extensions:
+    - attr_list
+    - md_in_html
+    - pymdownx.highlight:
+          anchor_linenums: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - admonition
+    - pymdownx.details
+
+extra_css:
+  - assets/style.css
+
+nav:
+  - User Guide: index.md
+  - Examples:
+      - Digit Recognition: examples/digit_recognition/index.md
+      - snAIke: examples/snaike/index.md
+  - API: api.md
+  - Care of Community: CARE_OF_COMMUNITY.md
+  - Changelog: changelog.md
+  - License: license.md
+

@@ -410,7 +410,7 @@ def evolve(
     population (of siblings), and returns a fitness score that is annotated
     as the network's ann["fitness"] value. The halt function takes the
     current population and generation count to determine if the genetic
-    algorithm should stop.
+    algorithm should stop. 
 
     The generate_function should take a list of the current population
     sorted by fitness, along with the optional fittest_proportion that
@@ -418,7 +418,7 @@ def evolve(
     mutation_chance, and mutation_amount parameters are used to control
     the mutation process. The generate_function returns a new unsorted
     population for the next generation.
-
+    
     The reverse flag indicates if the fittest ANN has the highest (True) or
     lowest (False) fitness score. Finally, the log function can be used to
     log each generation during the course of evolution. It defaults to a
