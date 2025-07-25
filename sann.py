@@ -1,8 +1,8 @@
 """
 ## Simple Artificial Neural Networks
 
-A naive Python implementation of an artificial neural network (ANN) that's 
-useful for educational purposes and clarifying the concepts of feed-forward 
+A naive Python implementation of an artificial neural network (ANN) that's
+useful for educational purposes and clarifying the concepts of feed-forward
 neural networks, backpropagation, neuro-evolution of weights and biases, and
 genetic algorithms. This implementation is not intended for production use or
 performance-critical applications. 😉
