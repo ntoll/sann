@@ -87,10 +87,10 @@ def create_network(structure: list) -> dict:
     nor bias associated with it. There must be at least two layers (an input
     layer and an output layer) for the ANN to be valid.
 
-    Other arbitrary arbitrary properties can be added to the returned
-    dictionary, such as a `fitness` score, which can be used for training or
-    evolution of the ANN, and a `structure` that defines the topology of the
-    ANN (i.e. the number of nodes in each layer).
+    Other arbitrary properties are added to the returned dictionary, such as 
+    a `fitness` score, which can be used for training or evolution of the ANN,
+    and a `structure` that defines the topology of the ANN (i.e. the number of
+    nodes in each layer).
     """
     if len(structure) < 2:
         raise ValueError(
