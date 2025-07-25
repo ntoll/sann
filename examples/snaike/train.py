@@ -1,12 +1,12 @@
 """
-Training script for playing the game of snake using a feedforward neural network
-as defined in the `sann` module and otherwise standard Python. This script trains the
-model to play the game by simulating the game environment and using the ANN to make
-decisions based on the game state. Newer and better versions of the ANN are evolved
-using a genetic algorithm approach.
+Training script for playing the game of snake using a feedforward neural
+network as defined in the `sann` module and otherwise standard Python. This
+script trains the model to play the game by simulating the game environment and
+using the ANN to make decisions based on the game state. Newer and better
+versions of the ANN are evolved using a genetic algorithm approach.
 
-Since this should work with MicroPython the script does not use any external libraries
-other than those in the (MicroPython) Python standard library.
+Since this should work with MicroPython the script does not use any external
+libraries other than those in the (MicroPython) Python standard library.
 
 Copyright (c) 2025 Nicholas H.Tollervey (ntoll@ntoll.org).
 
@@ -39,7 +39,7 @@ from snake import SnakeWorld
 from rich.progress import Progress
 
 # The number of ANNs in each generation.
-population_size = 200
+population_size = 500
 # The maximum number of generations to train for.
 max_generations = 100
 # The current highest fitness score.
@@ -83,7 +83,7 @@ def fitness_function(ann, current_population):
     """
     sw = SnakeWorld()
 
-    for i in range(1000):
+    for i in range(10000):
         # Up to 1000 iterations of the game.
         if not sw.alive:
             # The snake is dead. No point continuing.
