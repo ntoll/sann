@@ -10,20 +10,21 @@ implementation is not intended for production use or performance-critical
 applications. 😉
 
 See [Behind the AI Curtain](https://ntoll.org/article/ai-curtain/) for a 
-comprehensive exploration of the concepts behind this code.
-
-This module works with both [CPython](https://python.org) and
+comprehensive exploration of the concepts behind this code. This project's
+code and assets are [hosted on GitHub](https://github.com/ntoll/sann). The
+code works with both [CPython](https://python.org) and
 [MicroPython](https://micropython.org/).
 
-Try a couple of examples of this library online via PyScript:
+Try a couple of examples of this library online via
+[PyScript](https://pyscript.net/):
 
 * [Backpropagated numeral recognition](examples/digit_recognition/index.md) - 
   a neural network that underwent supervised training will categorise hand
   written numerals from a corpus of unseen test data. ✍️⁉️
 * [Neuro-evolved snake game](examples/snaike/index.md) - 
   the classic "SNAKE" game, but played by a neural network that underwent
-  unsupervised neuro-evolution. It's a snAIke. 🤖🐍 Play with the
-  arrow keys, or click the `[]`🤖 checkbox to toggle the AI autopilot.
+  unsupervised neuro-evolution. Play with the arrow keys, or click the
+  `[]`🤖 checkbox to toggle the AI autopilot. It's a snAIke. 🤖🐍
 
 ## Installation 📦
 
@@ -269,7 +270,8 @@ do_stuff_with(result)
 ## Developer Setup 🧑‍💻
 
 Before continuing, please read the statement about 
-[care of community](./CARE_OF_COMMUNITY.md).
+[care of community](./CARE_OF_COMMUNITY.md) ~ we hope everyone involved
+in this project will abide by the ethos expressed therein.
 
 1. Clone [the repository](https://github.com/ntoll/sann).
 2. Create a virtual environment.

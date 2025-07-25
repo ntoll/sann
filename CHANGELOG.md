@@ -1,5 +1,12 @@
 # SANN Changelog
 
+## 1.0.1
+
+* API naming clarification:
+    - Renamed `clean_ann` to `clean_network`.
+    - Renamed `create_ann` to `create_network`.
+* Documentation refinement.
+
 ## 1.0.0
 
 * Initial release.

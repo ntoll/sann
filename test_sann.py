@@ -38,7 +38,7 @@ def sample_ann():
     This ANN has 2 layers: an input layer with 3 nodes and an output layer
     with 2 nodes.
     """
-    return sann.create_ann([3, 2])
+    return sann.create_network([3, 2])
 
 
 def test_tlu():
@@ -47,9 +47,9 @@ def test_tlu():
     The TLU should return 1 if the input is greater than 0.5,
     otherwise it should return 0.
     """
-    assert sann.tlu(0.5, t=0.5) == 1
-    assert sann.tlu(0.4, t=0.5) == 0
-    assert sann.tlu(0.6, t=0.5) == 1
+    assert sann.tlu(0.5, threshold=0.5) == 1
+    assert sann.tlu(0.4, threshold=0.5) == 0
+    assert sann.tlu(0.6, threshold=0.5) == 1
 
 
 def test_create_ann(sample_ann):
@@ -72,7 +72,7 @@ def test_create_ann_too_few_layers():
     The function should raise a ValueError if the number of layers is less than 2.
     """
     with pytest.raises(ValueError):
-        sann.create_ann([3])  # Only one layer provided
+        sann.create_network([3])  # Only one layer provided
 
 
 def test_forward_pass(sample_ann):
@@ -102,7 +102,7 @@ def test_clean_ann(sample_ann):
     # Check that outputs are present before cleaning
     assert "output" in sample_ann["layers"][0][0]
     # Clean the ANN to remove outputs
-    cleaned_ann = sann.clean_ann(sample_ann)
+    cleaned_ann = sann.clean_network(sample_ann)
     assert "output" not in cleaned_ann["layers"][0][0]
 
 
@@ -114,7 +114,7 @@ def test_backpropagate():
     and backpropagation.
     """
     # Create a sample ANN with a hidden layer and an output layer.
-    sample_ann = sann.create_ann([3, 5, 2])
+    sample_ann = sann.create_network([3, 5, 2])
     # Set the weights and biases to known values for testing.
     sample_ann["layers"][0][0]["weights"] = [0.5, 0.2, 0.8]
     sample_ann["layers"][0][0]["bias"] = 0
@@ -178,7 +178,7 @@ def test_roulette_wheel_selection():
     Test the roulette wheel selection function for selecting parents based on fitness.
     """
     # Create 5 sample ANN with associated fitness values.
-    anns = [sann.create_ann([3, 5, 2]) for _ in range(5)]
+    anns = [sann.create_network([3, 5, 2]) for _ in range(5)]
     for ann in anns:
         ann["fitness"] = random.uniform(0, 1)  # Assign random fitness values
 
@@ -195,8 +195,8 @@ def test_crossover():
     Test the crossover function for combining two parent ANNs.
     """
     # Create two sample ANNs (parents).
-    mum = sann.create_ann([3, 5, 2])
-    dad = sann.create_ann([3, 5, 2])
+    mum = sann.create_network([3, 5, 2])
+    dad = sann.create_network([3, 5, 2])
 
     # Perform crossover.
     child1, child2 = sann.crossover(mum, dad)
@@ -213,7 +213,7 @@ def test_mutate():
     Test the mutation function for randomly adjusting weights and biases of an ANN.
     """
     # Create a sample ANN.
-    ann = sann.create_ann([3, 5, 2])
+    ann = sann.create_network([3, 5, 2])
 
     # Store original weights and biases for comparison.
     original_weights = [
@@ -255,7 +255,7 @@ def test_simple_generate():
     """
     Test the simple_generate function for creating a new population of ANNs.
     """
-    old_population = [sann.create_ann([3, 5, 2]) for _ in range(10)]
+    old_population = [sann.create_network([3, 5, 2]) for _ in range(10)]
     # Create test fitness values for the old population.
     for ann in old_population:
         ann["fitness"] = random.uniform(0, 1)

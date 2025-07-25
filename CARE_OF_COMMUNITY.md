@@ -1,20 +1,20 @@
 # On Being Together
 
-```
+<pre id="on_being_together">
 When being together, especially if things go wrong,  
 we acknowledge and work through differences.  
 In so doing, we transform and enlarge each other.
 
 To nurture our mutual growth,
 
-  this is a place of  
-    learning, understanding, and sharing;  
+    this is a place of  
+        learning, understanding, and sharing;  
 
-  this is a place to  
-    affirm tolerance and compassion;  
+    this is a place to  
+        affirm tolerance and compassion;  
 
-  this is a place for  
-    collaborative creativity.
+    this is a place for  
+        collaborative creativity.
 
 All the aspects of yourself you choose to bring to this place  
 are welcome here.
@@ -29,7 +29,7 @@ To act against this spirit invites ostracism,
 a loss that diminishes us all.
 
 Thank you.
-```
+</pre>
 
 ---
 

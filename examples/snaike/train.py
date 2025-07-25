@@ -185,7 +185,7 @@ def main():
 
     # Save the fittest ANN to a file.
     with open(fittest_ann_file, "w") as f:
-        ann = sann.clean_ann(population[0])
+        ann = sann.clean_network(population[0])
         json.dump(ann, f, indent=2)
         rich.print(
             f"[green]Fittest ANN saved to: [bold]{fittest_ann_file}[/bold][/green]"

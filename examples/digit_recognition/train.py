@@ -81,7 +81,7 @@ def train_model(train_data, layers, epochs=1000, learning_rate=0.1, log=print):
         The trained ANN model.
     """
     # Initialize the ANN with the specified layers
-    ann = sann.create_ann(layers)
+    ann = sann.create_network(layers)
 
     # Train the ANN
     sann.train(
@@ -156,7 +156,7 @@ def main():
         )
 
         # Remove the outputs stored in nodes to clean up the ANN
-        ann = sann.clean_ann(ann)
+        ann = sann.clean_network(ann)
 
     with open("nn.json", "w") as f:
         json.dump(ann, f, indent=2)

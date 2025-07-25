@@ -1,4 +1,9 @@
 site_name: Simple Artificial Neural Networks (SANN)
+site_author: Nicholas H.Tollervey
+site_description: Simple Artificial Neural Networks (SANN) - for educational purposes only.
+
+copyright: Copyright © 2025 <a href="https://ntoll.org"><u>Nicholas H.Tollervey</u></a> (<a href="mailto:ntoll@ntoll.org">ntoll@ntoll.org</a>)
+
 theme: 
   name: material
   logo: assets/logo_white.svg
@@ -35,4 +40,5 @@ nav:
   - Care of Community ❤️: CARE_OF_COMMUNITY.md
   - Changelog 📜: changelog.md
   - License ⚖️: license.md
+  - Acknowledgements 🙏: acknowledgements.md
 

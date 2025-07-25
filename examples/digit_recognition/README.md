@@ -7,6 +7,8 @@ handwritten input.
 
 [See the network categorize digits here.](./web/index.html)
 
+[The source code for this example is here.](https://github.com/ntoll/sann/tree/main/examples/digit_recognition)
+
 The data used for training and testing is contained in the 
 `optdigits.tra` (training) and `optdigits.tes` (testing) files. The
 `optdigits.names` file contains a description of the size and shape of

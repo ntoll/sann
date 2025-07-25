@@ -21,6 +21,7 @@ docs: clean
 	cp assets/*.svg docs/docs/assets/
 	cp assets/style.css docs/docs/assets/
 	cp assets/api.md docs/docs/
+	cp assets/README.md docs/docs/acknowledgements.md
 	cp README.md docs/docs/index.md
 	cp LICENSE.md docs/docs/license.md
 	cp CHANGELOG.md docs/docs/changelog.md

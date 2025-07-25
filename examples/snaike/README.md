@@ -7,6 +7,8 @@ click on the `[]`🤖 checkbox to toggle the neuro-evolved AI autopilot.
 
 [Play the game here.](./web/index.html)
 
+[The source code for this example is here.](https://github.com/ntoll/sann/tree/main/examples/snaike)
+
 The network (ANN) receives 8 inputs representing the game state:
 
 - 4 inputs indicating the direction towards the next food item in the

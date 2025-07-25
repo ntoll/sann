@@ -1,15 +1,17 @@
 """
-Simple Artificial Neural Networks (sann.py).
+## Simple Artificial Neural Networks
 
-A naive Python implementation of an ANN that's useful for educational purposes
-and clarifying the concepts of feed-forward neural networks, backpropagation,
-neuro-evolution of weights and biases, and genetic algorithms. This
-implementation is not intended for production use or performance-critical
-applications. ;-)
+A naive Python implementation of an artificial neural network (ANN) that's 
+useful for educational purposes and clarifying the concepts of feed-forward 
+neural networks, backpropagation, neuro-evolution of weights and biases, and
+genetic algorithms. This implementation is not intended for production use or
+performance-critical applications. 😉
 
-See: https://ntoll.org/article/ai-curtain/ for a comprehensive and informal
-exploration of the concepts behind this code.
+See:
+[https://ntoll.org/article/ai-curtain/](https://ntoll.org/article/ai-curtain/)
+for a comprehensive and informal exploration of the concepts behind this code.
 
+```
 Copyright (c) 2025 Nicholas H.Tollervey (ntoll@ntoll.org).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -29,13 +31,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 """
 
 import math
 import random
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
@@ -46,28 +49,29 @@ def sum_inputs(inputs: list[tuple[float, float]]) -> float:
     return sum([x * w for x, w in inputs])
 
 
-def sigmoid(a: float, t: float = 0.0, r: float = 0.5) -> float:
+def sigmoid(
+    activation: float, threshold: float = 0.0, shape: float = 0.5
+) -> float:
     """
     Calculate the output value of a sigmoid based node.
 
-    Take the activation value `a`, a threshold value `t`, and a shape parameter
-    `r`, and return the output value found somewhere on an s-shaped sigmoid
-    curve.
+    Take the `activation` value, a `threshold` value, and a `shape` parameter,
+    and return the output value found somewhere on an s-shaped sigmoid curve.
     """
-    return 1 / (1 + math.exp(-((a - t) / r)))
+    return 1 / (1 + math.exp(-((activation - threshold) / shape)))
 
 
-def tlu(a: int | float, t: int | float = 0) -> int:
+def tlu(activation: int | float, threshold: int | float = 0) -> int:
     """
     Calculate the output value of a threshold logic unit (TLU).
 
-    If the activation (`a`) is greater than the threshold (`t`), set the output
+    If the `activation` is greater than the `threshold`, set the output
     to `1` (truthy), else set it to `0` (falsey).
     """
-    return 1 if a >= t else 0
+    return 1 if activation >= threshold else 0
 
 
-def create_ann(structure: list) -> dict:
+def create_network(structure: list) -> dict:
     """
     Return a dict representing a simple artificial neural network (ANN).
 
@@ -131,7 +135,7 @@ def run_network(ann: dict, inputs: list) -> list:
     return outputs
 
 
-def clean_ann(ann: dict) -> dict:
+def clean_network(ann: dict) -> dict:
     """
     Remove the outputs stored in nodes to clean up the `ann`, so only the
     weights and biases remain.
@@ -234,7 +238,7 @@ def train(
         log(f"Epoch {_ + 1}/{epochs}")
         for inputs, expected_outputs in training_data:
             backpropagate(ann, inputs, expected_outputs, learning_rate)
-        log(clean_ann(ann))
+        log(clean_network(ann))
     log("Training complete.")
     return ann
 
@@ -250,7 +254,7 @@ def roulette_wheel_selection(population: list[dict]) -> dict:
     subtotal is greater than the randomly chosen point it returns the ANN
     at that point "on the wheel".
 
-    See: https://en.wikipedia.org/wiki/Fitness_proportionate_selection
+    [More info.](https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
     """
     total_fitness = 0.0
     for ann in population:
@@ -433,7 +437,7 @@ def evolve(
     ordered by fitness.
     """
     # Create initial population
-    seed_generation = [create_ann(layers) for _ in range(population_size)]
+    seed_generation = [create_network(layers) for _ in range(population_size)]
     # Sort it by fitness
     for ann in seed_generation:
         ann["fitness"] = fitness_function(ann, seed_generation)
