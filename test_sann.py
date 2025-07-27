@@ -41,18 +41,19 @@ def sample_ann():
     return sann.create_network([3, 2])
 
 
-def test_tlu():
+def test_sigmoid():
     """
-    Test the threshold logic unit (TLU) activation function.
-    The TLU should return 1 if the input is greater than 0.5,
-    otherwise it should return 0.
+    Test the sigmoid activation function.
+    The sigmoid function should return a value between 0 and 1.
     """
-    assert sann.tlu(0.5, threshold=0.5) == 1
-    assert sann.tlu(0.4, threshold=0.5) == 0
-    assert sann.tlu(0.6, threshold=0.5) == 1
+    assert 0 <= sann.sigmoid(0) <= 1
+    assert 0 <= sann.sigmoid(1) <= 1
+    assert 0 <= sann.sigmoid(-1) <= 1
+    assert 0 <= sann.sigmoid(100) <= 1
+    assert 0 <= sann.sigmoid(-100) <= 1
 
 
-def test_create_ann(sample_ann):
+def test_create_network(sample_ann):
     """
     Test the creation of an ANN with 2 layers.
     The first layer should have 3 nodes and the second layer should have 2
@@ -66,7 +67,7 @@ def test_create_ann(sample_ann):
     assert "bias" in sample_ann["layers"][0][0]  # A node should have a bias
 
 
-def test_create_ann_too_few_layers():
+def test_create_network_too_few_layers():
     """
     Test the creation of an ANN with too few layers.
     The function should raise a ValueError if the number of layers is less than 2.
@@ -75,7 +76,7 @@ def test_create_ann_too_few_layers():
         sann.create_network([3])  # Only one layer provided
 
 
-def test_forward_pass(sample_ann):
+def test_run_network(sample_ann):
     """
     Test the forward pass through the ANN with sample inputs.
     The inputs should be a list of 3 values corresponding to the input
@@ -92,7 +93,7 @@ def test_forward_pass(sample_ann):
     )  # Outputs should be between 0 and 1
 
 
-def test_clean_ann(sample_ann):
+def test_clean_network(sample_ann):
     """
     Test the cleaning of the ANN by removing outputs from the nodes.
     """

@@ -1,5 +1,11 @@
 # SANN Changelog
 
+## 1.0.2
+
+* Removed the unused `tlu` function.
+* Updated tests to reflect this change.
+* Minor documentation tidy-ups.
+
 ## 1.0.1
 
 * API naming clarification:

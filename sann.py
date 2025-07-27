@@ -1,11 +1,12 @@
 """
 ## Simple Artificial Neural Networks
 
-A naive Python implementation of an artificial neural network (ANN) that's
-useful for educational purposes and clarifying the concepts of feed-forward
-neural networks, backpropagation, neuro-evolution of weights and biases, and
-genetic algorithms. This implementation is not intended for production use or
-performance-critical applications. 😉
+Simple Artificial Neural Networks (SANN) is a naive Python implementation of
+an artificial neural network (ANN) that's useful for educational purposes
+and clarifying the concepts of feed-forward neural networks, backpropagation,
+neuro-evolution of weights and biases, and genetic algorithms. SANN is not
+intended for production use or performance-critical applications. Rather, use
+it for educational, playful or small-scale projects. 😉
 
 See:
 [https://ntoll.org/article/ai-curtain/](https://ntoll.org/article/ai-curtain/)
@@ -38,7 +39,7 @@ import math
 import random
 
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
@@ -61,16 +62,6 @@ def sigmoid(
     return 1 / (1 + math.exp(-((activation - threshold) / shape)))
 
 
-def tlu(activation: int | float, threshold: int | float = 0) -> int:
-    """
-    Calculate the output value of a threshold logic unit (TLU).
-
-    If the `activation` is greater than the `threshold`, set the output
-    to `1` (truthy), else set it to `0` (falsey).
-    """
-    return 1 if activation >= threshold else 0
-
-
 def create_network(structure: list) -> dict:
     """
     Return a dict representing a simple artificial neural network (ANN).
@@ -87,7 +78,7 @@ def create_network(structure: list) -> dict:
     nor bias associated with it. There must be at least two layers (an input
     layer and an output layer) for the ANN to be valid.
 
-    Other arbitrary properties are added to the returned dictionary, such as 
+    Other arbitrary properties are added to the returned dictionary, such as
     a `fitness` score, which can be used for training or evolution of the ANN,
     and a `structure` that defines the topology of the ANN (i.e. the number of
     nodes in each layer).
@@ -121,7 +112,7 @@ def run_network(ann: dict, inputs: list) -> list:
 
     The inputs are a list of values that are fed into the first layer of the
     ANN. The output of each layer is calculated and passed to the next layer
-    until the final output is produced.
+    until the final output is produced and returned as a list of values.
     """
     outputs = inputs
     for layer in ann["layers"]:

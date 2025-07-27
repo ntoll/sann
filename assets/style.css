@@ -10,4 +10,11 @@
 
 #on_being_together {
     font-family: inherit;
+    margin: 0!important;
+}
+
+@media screen and (max-width: 44.984375em) {
+    #on_being_together {
+        margin: 0;
+    }
 }
