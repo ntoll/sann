@@ -201,8 +201,8 @@ evolution of a population of networks is required. This is illustrated in the
 `examples/snaike/train.py` file.
 
 Use the `evolve` function in combination with a fitness function and halting
-function to generate an evolved ANN. This is the minimal viable way of using
-`evolve`:
+function to run a genetic algorithm that evolves ANN. This is the minimal
+viable way of using `evolve`:
 
 ```python
 evolved_population = sann.evolve(
