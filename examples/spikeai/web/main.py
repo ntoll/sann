@@ -365,6 +365,9 @@ class WebBotWorld(BotWorld):
                 ctx.restore()
 
 
+# Now let's write the actual game..!
+
+
 # Let there be light!
 bw = WebBotWorld(40, 40)
 
