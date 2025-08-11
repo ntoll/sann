@@ -38,6 +38,8 @@ tidy:
 	black -l 79 *.py
 	black -l 79 examples/digit_recognition/*.py
 	black -l 79 examples/snaike/*.py
+	black -l 79 examples/spikeai/*.py
+	black -l 79 examples/spikeai/web/*.py
 
 test:
 	pytest --cov=sann --cov-report=term-missing
