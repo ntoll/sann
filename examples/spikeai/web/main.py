@@ -310,6 +310,7 @@ class WebBotWorld(BotWorld):
         self.ctx.save()
         self.ctx.strokeStyle = f"rgb({red}, {green}, {blue})"
         self.ctx.lineWidth = 1
+        self.ctx.setLineDash([6, 4])
         self.ctx.beginPath()
         self.ctx.moveTo(bot_x, bot_y)
         self.ctx.lineTo(end_x, end_y)

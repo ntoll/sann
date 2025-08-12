@@ -4,6 +4,8 @@ clean:
 	rm -rf .pytest_cache
 	rm -rf examples/digit_recognition/nn.json
 	rm -rf examples/snaike/fittest_ann.json
+	rm -rf examples/spikeai/fittest_ann.json
+	rm -rf examples/spikeai/web/bot.py
 	rm -rf examples/snaike/nn.json
 	rm -rf docs/docs/*
 	rm -rf docs/site
@@ -16,6 +18,9 @@ clean:
 docs: clean
 	cp sann.py examples/digit_recognition/web/
 	cp sann.py examples/snaike/web/
+	cp sann.py examples/spikeai/web/
+	cp sann.py examples/snaike/web/
+	cp examples/spikeai/bot.py examples/spikeai/web/
 	cp sann.py docs/
 	mkdir -p docs/docs/assets
 	cp assets/*.svg docs/docs/assets/
@@ -32,6 +37,9 @@ docs: clean
 	mkdir -p docs/docs/examples/snaike
 	cp -r examples/snaike/* docs/docs/examples/snaike/
 	mv docs/docs/examples/snaike/README.md docs/docs/examples/snaike/index.md
+	mkdir -p docs/docs/examples/spikeai
+	cp -r examples/spikeai/* docs/docs/examples/spikeai/
+	mv docs/docs/examples/spikeai/README.md docs/docs/examples/spikeai/index.md
 	cd docs && mkdocs build --clean
 
 tidy:

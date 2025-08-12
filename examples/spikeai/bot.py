@@ -134,6 +134,54 @@ class Bot:
         return input_layer
 
 
+class SANNBot(Bot):
+    """
+    A bot that uses a neural network to navigate the world.
+    """
+
+    def __init__(self, world, brain):
+        super().__init__()
+        self.world = world
+        # The ANN associated with this bot.
+        self.brain = brain
+        # The bot's lifespan measured in ticks.
+        self.lifespan = 0
+    
+    def detect_color(self):
+        self.colour_reading = self.world.get_color_ahead(
+            self.x, self.y, self.angle
+        )
+
+    def detect_distance(self):
+        self.distance_reading = self.world.get_distance_ahead(
+            self.x, self.y, self.angle
+        )
+
+    def drive(self):
+        """
+        Update the bot's motors based on its brain's output given the current
+        state of its sensors.
+
+        There are two outputs for each wheel, one for travelling forwards, the
+        other for moving backwards. The highest output for each wheel 
+        determines its direction and speed.
+        """
+        # Run the sensors through the neural network to get an output 
+        # decision.
+        outputs = sann.run_network(self.brain, self.input_layer())
+        # Outputs 0/1 control forwards/backwards movement of left wheel.
+        if outputs[0] >= outputs[1]:
+            left_wheel_output = outputs[0]
+        else:
+            left_wheel_output = -outputs[1]
+        # Outputs 2/3 control forwards/backwards movement of right wheel.
+        if outputs[2] >= outputs[3]:
+            right_wheel_output = outputs[2]
+        else:
+            right_wheel_output = -outputs[3]
+        self.set_motors(left_wheel_output, right_wheel_output)
+
+
 class BotWorld:
     """
     Represents a simple virtual world for the bot to navigate. The world is a
@@ -176,7 +224,7 @@ class BotWorld:
         self.obstacles = {}  # Dictionary of obstacle positions.
         self.bots = []  # a list of bots found in the world.
 
-    def update_world(self):
+    async def update_world(self):
         """
         Draw the world, including all bots and obstacles.
         """

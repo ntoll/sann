@@ -117,6 +117,8 @@ venv.bak/
 # Training output
 examples/digit_recognition/nn.json
 examples/snaike/fittest_ann.json
+examples/spikeai/fittest_ann.json
+examples/spikeai/web/bot.py
 
 # Minified files
 sann.min.py
@@ -128,4 +130,5 @@ docs/docs/
 # Copy of sann.py for examples and docs
 examples/digit_recognition/web/sann.py
 examples/snaike/web/sann.py
+examples/spikeai/web/sann.py
 docs/sann.py

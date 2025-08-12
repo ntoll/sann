@@ -47,7 +47,7 @@ current_max_fitness = 0
 # The number of generations since the last fitness improvement.
 fitness_last_updated = 0
 # The maximum number of ticks allowed in a single game.
-max_game_ticks = 1000
+max_game_ticks = 100000
 # The name of the file to save the fittest ANN.
 fittest_ann_file = "fittest_ann.json"
 
@@ -83,8 +83,8 @@ def fitness_function(ann, current_population):
     """
     sw = SnakeWorld()
 
-    for i in range(10000):
-        # Up to 1000 iterations of the game.
+    for i in range(max_game_ticks):
+        # Up to 100000 iterations of the game.
         if not sw.alive:
             # The snake is dead. No point continuing.
             break
