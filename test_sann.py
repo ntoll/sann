@@ -191,6 +191,23 @@ def test_roulette_wheel_selection():
     assert "fitness" in result
 
 
+def test_roulette_wheel_selection_zero_total_fitness():
+    """
+    Test the roulette wheel selection function when all fitness values are zero.
+    """
+    # Create 5 sample ANN with zero fitness values.
+    anns = [sann.create_network([3, 5, 2]) for _ in range(5)]
+    for ann in anns:
+        ann["fitness"] = 0
+
+    result = sann.roulette_wheel_selection(anns)
+
+    # Check the result is one of the ANNs.
+    assert result in anns
+    # Check that the selected ANN has a fitness value.
+    assert "fitness" in result
+
+
 def test_crossover():
     """
     Test the crossover function for combining two parent ANNs.

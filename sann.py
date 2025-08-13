@@ -252,6 +252,10 @@ def roulette_wheel_selection(population: list[dict]) -> dict:
         if "fitness" in ann:
             total_fitness += ann["fitness"]
 
+    if total_fitness == 0:
+        # If all fitness scores are zero, select a random ANN.
+        return random.choice(population)
+
     random_point = random.uniform(0.0, total_fitness)
 
     fitness_tally = 0.0

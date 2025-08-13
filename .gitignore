@@ -118,6 +118,8 @@ venv.bak/
 examples/digit_recognition/nn.json
 examples/snaike/fittest_ann.json
 examples/spikeai/fittest_ann.json
+examples/spikeai/ann_supervised.json
+examples/spikeai/ann_evolved.json
 examples/spikeai/web/bot.py
 
 # Minified files

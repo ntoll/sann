@@ -4,8 +4,10 @@ clean:
 	rm -rf .pytest_cache
 	rm -rf examples/digit_recognition/nn.json
 	rm -rf examples/snaike/fittest_ann.json
-	rm -rf examples/spikeai/fittest_ann.json
+	rm -rf examples/spikeai/ann_evolved.json
+	rm -rf examples/spikeai/ann_supervised.json
 	rm -rf examples/spikeai/web/bot.py
+	rm -rf examples/spikeai/web/sann.py
 	rm -rf examples/snaike/nn.json
 	rm -rf docs/docs/*
 	rm -rf docs/site

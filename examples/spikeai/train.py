@@ -27,82 +27,31 @@ import sys
 
 sys.path.append("../../")  # Adjust path to import sann module
 
+from docs.site.examples.digit_recognition.train import train_model
 import sann
 import json
-import math
 import rich
 import random
-from bot import SANNBot, BotWorld
+from bot import SANNBot, TrainingWorld
 from rich.progress import Progress
 
-
+# ANN layers
+layers = [6, 12, 2]
 # The number of ANNs in each generation.
 population_size = 500
 # The maximum number of generations to train for.
-max_generations = 1000
+max_generations = 100
 # The current highest fitness score.
 current_max_fitness = 0
 # The number of generations since the last fitness improvement.
 fitness_last_updated = 0
 # Fitness plateau duration (in generations). If the fitness has not improved
 # for this many generations, training will be halted.
-fitness_plateau_duration = 100
+fitness_plateau_duration = 50
 # The maximum number of ticks allowed in a single game.
-max_game_ticks = 10000
+max_game_ticks = 1000
 # The name of the file to save the fittest ANN.
-fittest_ann_file = "fittest_ann.json"
-
-
-class TrainingWorld(BotWorld):
-    """
-    A virtual world for training bots.
-    """
-
-    def add_bot(self, bot: SANNBot, x: int, y: int, angle: float = 0.0):
-        """
-        Annotate the bot with a bunch of implementation details for the sake
-        of convenience in the web world.
-        """
-        bot.x = x
-        bot.y = y
-        bot.angle = angle % 360
-        self.bots.append(bot)
-
-    def update_world(self):
-        """
-        Update the state of the world by moving all bots and checking for
-        collisions.
-        """
-        # Remove dead bots
-        self.bots = [bot for bot in self.bots if not bot.collided]
-        for bot in self.bots:
-            # Update lifespan
-            bot.lifespan += 1
-            # Calculate new position/state based on motor values.
-            rotation_speed = (bot.right_motor - bot.left_motor) * 10.0
-            forward_speed = (bot.left_motor + bot.right_motor) / 2.0
-            # Use the forward speed to update the bot's position.
-            if forward_speed != 0:
-                dx = math.sin(math.radians(bot.angle)) * forward_speed * 2
-                dy = -math.cos(math.radians(bot.angle)) * forward_speed * 2
-                nx, ny = bot.x + int(round(dx)), bot.y + int(round(dy))
-                # Check bounds and collisions
-                if (
-                    (nx, ny) not in self.obstacles
-                    and 0 <= nx < self.width
-                    and 0 <= ny < self.height
-                ) or not any(
-                    other.x == nx and other.y == ny and other != bot
-                    for other in self.bots
-                ):
-                    # Set new position.
-                    bot.x = nx
-                    bot.y = ny
-                else:
-                    # Bang!
-                    bot.collided = True
-            # Update bot's angle based on rotation speed.
-            bot.angle = (bot.angle + rotation_speed) % 360
+fittest_ann_file = "ann_evolved.json"
 
 
 def fitness_function(ann, current_population):
@@ -150,13 +99,31 @@ def fitness_function(ann, current_population):
         tw.add_bot(SANNBot(tw, ann), x, y)
     # Now run the world for the maximum number of ticks
     for _ in range(max_game_ticks):
-        tw.update_world()
+        tw.tick()
         if bot.collided:
             # No need to continue if the bot has collided with something.
             break
+    fitness = 0.0
     # The fittest bots will survive the longest in the world by avoiding all
-    # the obstacles, so the bot's lifespan is a measure of its fitness.
-    return bot.lifespan
+    # the obstacles, so the bot's lifespan is one measure of its fitness.
+    fitness += bot.lifespan / 2
+    # The number of obstacles successfully detected is also a measure of
+    # fitness.
+    fitness += bot.obstacles_detected
+    # The number of positions in the world that the bot has been able to visit
+    # also indicates an ability to successfully navigate around the world.
+    # However, we penalise the bot for wall-banging behaviour by adding a cost
+    # for each position it has visited multiple times.
+    for pos, count in bot.travel_log.items():
+        fitness -= count
+    fitness += len(bot.travel_log) * 1.5
+    # If the bot has collided with something, that's a bad thing. So punish the
+    # fitness score by penalising earlier collisions more heavily, relative to
+    # how long the bot survived.
+    if bot.collided:
+        fitness -= 1
+    fitness = min(0, fitness)
+    return fitness
 
 
 def halt_function(current_population, generation_count):
@@ -176,9 +143,6 @@ def halt_function(current_population, generation_count):
         current_max_fitness = current_population[0]["fitness"]
         # Reset the fitness last updated counter.
         fitness_last_updated = 0
-        if current_max_fitness == max_game_ticks:
-            # Reached the max possible fitness, so stop training.
-            return True
         return False  # Continue training
     else:
         # Increment the fitness last updated counter.
@@ -190,7 +154,7 @@ def halt_function(current_population, generation_count):
         else:
             return False
 
-def main():
+def evolve():
     """
     Main function to run the training process.
     """
@@ -209,7 +173,7 @@ def main():
             )
 
         population = sann.evolve(
-            layers=[11, 8, 4],
+            layers=layers,
             population_size=population_size,
             fitness_function=fitness_function,
             halt_function=halt_function,
@@ -225,5 +189,61 @@ def main():
         )
 
 
+def evaluate_model(ann, dataset):
+    """
+    Evaluate the performance of the given ANN on the training world.
+
+    Round the actual outputs to the nearest integer to do a fuzzy comparison.
+    """
+    average_score = 0
+    for inputs, expected_outputs in dataset:
+        outputs = sann.run_network(ann, inputs)
+        outputs = [round(o) for o in outputs if o < 0.2 or o > 0.8]
+        average_score += sum(
+            1 for expected, actual in zip(expected_outputs, outputs)
+            if expected == actual
+        ) / len(expected_outputs)
+    return average_score / len(dataset)
+
+def backprop_train(data):
+    """
+    Train the ANN using backpropagation on the provided dataset.
+    """
+    # Number of epochs to train over
+    epochs = 10000
+
+    # Learning rate (rate of change as weights are adjusted)
+    learning_rate = 0.1
+
+    with Progress() as progress:
+        training_task = progress.add_task("Training network", total=epochs)
+
+         # Load the training data.
+        with open(data, "r") as f:
+            dataset = json.load(f)
+
+        # Initialize the ANN with the specified layers
+        ann = sann.create_network(layers)
+
+        def handle_log(data):
+            accuracy = evaluate_model(ann, dataset)
+            progress.update(
+                training_task,
+                advance=1,
+                description=f"Model score: {accuracy}",
+            )
+
+        # Train the ANN
+        ann = sann.train(
+            ann, dataset, epochs=epochs, learning_rate=learning_rate, log=handle_log
+        )
+
+        # Remove the outputs stored in nodes to clean up the ANN
+        ann = sann.clean_network(ann)
+
+    with open("ann_supervised.json", "w") as f:
+        json.dump(ann, f, indent=2)
+
 if __name__ == "__main__":
-    main()
+    evolve()
+    backprop_train("labelled_data.json")
