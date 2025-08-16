@@ -15,16 +15,19 @@ code and assets are [hosted on GitHub](https://github.com/ntoll/sann). The
 code works with both [CPython](https://python.org) and
 [MicroPython](https://micropython.org/).
 
-Try a couple of examples of this library online via
+Try examples of this library online via
 [PyScript](https://pyscript.net/):
 
 * [Backpropagated numeral recognition](examples/digit_recognition/index.md) - 
   a neural network that underwent supervised training will categorise hand
-  written numerals from a corpus of unseen test data. ✍️⁉️
+  written numerals from a corpus of unseen test data. ✍️🎓
 * [Neuro-evolved snake game](examples/snaike/index.md) - 
   the classic "SNAKE" game, but played by a neural network that underwent
   unsupervised neuro-evolution. Play with the arrow keys, or click the
-  `[]`🤖 checkbox to toggle the AI autopilot. It's a snAIke. 🤖🐍
+  `[]`🤖 checkbox to toggle the AI autopilot. It's a snAIke. 🐍🧬
+* [Tanks a lot](examples/tanksalot/index.md) - both virtual and real-world
+  tank-bots use supervised and unsupervised neural networks, along with a 
+  "stupid" hard coded solution, to navigate obstacles in the world. 💥⁉️
 
 ## Installation 📦
 
