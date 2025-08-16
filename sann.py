@@ -39,7 +39,7 @@ import math
 import random
 
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:

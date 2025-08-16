@@ -1,5 +1,9 @@
 # SANN Changelog
 
+## 1.0.3
+
+* Added "Tanks a lot" example to the documentation.
+
 ## 1.0.2
 
 * Removed the unused `tlu` function.

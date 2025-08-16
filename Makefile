@@ -4,10 +4,10 @@ clean:
 	rm -rf .pytest_cache
 	rm -rf examples/digit_recognition/nn.json
 	rm -rf examples/snaike/fittest_ann.json
-	rm -rf examples/spikeai/ann_evolved.json
-	rm -rf examples/spikeai/ann_supervised.json
-	rm -rf examples/spikeai/web/bot.py
-	rm -rf examples/spikeai/web/sann.py
+	rm -rf examples/tanksalot/ann_evolved.json
+	rm -rf examples/tanksalot/ann_supervised.json
+	rm -rf examples/tanksalot/web/bot.py
+	rm -rf examples/tanksalot/web/sann.py
 	rm -rf examples/snaike/nn.json
 	rm -rf docs/docs/*
 	rm -rf docs/site
@@ -20,9 +20,9 @@ clean:
 docs: clean
 	cp sann.py examples/digit_recognition/web/
 	cp sann.py examples/snaike/web/
-	cp sann.py examples/spikeai/web/
+	cp sann.py examples/tanksalot/web/
 	cp sann.py examples/snaike/web/
-	cp examples/spikeai/bot.py examples/spikeai/web/
+	cp examples/tanksalot/bot.py examples/tanksalot/web/
 	cp sann.py docs/
 	mkdir -p docs/docs/assets
 	cp assets/*.svg docs/docs/assets/
@@ -39,17 +39,17 @@ docs: clean
 	mkdir -p docs/docs/examples/snaike
 	cp -r examples/snaike/* docs/docs/examples/snaike/
 	mv docs/docs/examples/snaike/README.md docs/docs/examples/snaike/index.md
-	mkdir -p docs/docs/examples/spikeai
-	cp -r examples/spikeai/* docs/docs/examples/spikeai/
-	mv docs/docs/examples/spikeai/README.md docs/docs/examples/spikeai/index.md
+	mkdir -p docs/docs/examples/tanksalot
+	cp -r examples/tanksalot/* docs/docs/examples/tanksalot/
+	mv docs/docs/examples/tanksalot/README.md docs/docs/examples/tanksalot/index.md
 	cd docs && mkdocs build --clean
 
 tidy:
 	black -l 79 *.py
 	black -l 79 examples/digit_recognition/*.py
 	black -l 79 examples/snaike/*.py
-	black -l 79 examples/spikeai/*.py
-	black -l 79 examples/spikeai/web/*.py
+	black -l 79 examples/tanksalot/*.py
+	black -l 79 examples/tanksalot/web/*.py
 
 test:
 	pytest --cov=sann --cov-report=term-missing
