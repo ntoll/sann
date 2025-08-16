@@ -63,18 +63,14 @@ In this example three types of bot were created:
     - The other evolved from "living" in a virtual world containing
       obstacles and other bots.
 
+All the core bot related code is in the `bot.py` file in this example.
+
 These "bots" were placed into a virtual world to see how they would behave.
 Here's how it looks:
 
 <img src="./bots.gif" title="Tank bots."/>
 
 [See these bots running live in your browser](web/).
-
-Each neural network has an input layer of six nodes: one to indicate no
-obstacle has been detected, with the other five used to indicate how close
-a detected obstacle is. The output layer is simply two nodes, whose output
-values control the speed of the left and right motors. Twelve nodes make up
-the hidden layer in these networks.
 
 The "stupid" bot's hard-coded instructions were:
 
@@ -97,11 +93,16 @@ def drive(self):
         self.set_motors(0.5, 0.5)  # Gently move forward.
 ```
 
+Each neural network has an input layer of six nodes: one to indicate no
+obstacle detected, with the other five used to indicate how close
+a detected obstacle is. The output layer is simply two nodes, whose output
+values control the speed of the left and right motors. Twelve nodes make up
+the hidden layer in these networks. How did I arrive at twelve nodes in the
+hidden layer? Trial and error and intuition.
+
 **It took but five minutes to code the instructions for the "stupid" bot.
 It took several evenings and a weekend of work to create the virtual world
 in which the neural networks could be tested.**
-
-All the core bot related code is in the `bot.py` file in this example.
 
 Furthermore, the initial versions of the labelled data for supervised
 learning, and the fitness function for the neuro-evolution required
@@ -157,10 +158,15 @@ The code used to control the Lego bot is found in the `spike_code.py` file
 in this example. As you'll see I've extracted only those functions required
 from SANN to evaluate the neural network. I updated the code so it ran
 without a neural network (as "stupid" bot), and with the two neural networks
-trained and evolved in the virtual world. If you use a non-Lego bot, you'll
-need to update the code for interacting with the motors and distance sensor.
+trained and evolved in the virtual world. In a sense, I performed a brain
+transplant from the virtual world to the real world.
 
-I think the results speak for themselves (and are best accompanied by music):
+If you use a non-Lego bot, you'll need to update the code for interacting
+with the motors and distance sensor.
+
+I used various instrument cases in my music room to act as obstacles in the
+real world, and let the different versions of the bot loose. I think the
+results speak for themselves (and are best accompanied by music):
 
 <div>
   <div style="position:relative;padding-top:56.25%;">
