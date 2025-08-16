@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 import sys
 
 sys.path.append("../../")  # Adjust path to import sann module
@@ -34,7 +35,7 @@ import sann
 class Bot:
     """
     Represents a simple bot with two motors: left and right. Each motor can
-    have a value in the range of: 1 (max forwards) to 0 (stopped). The bot 
+    have a value in the range of: 1 (max forwards) to 0 (stopped). The bot
     can move in any direction by adjusting the speed of its motors like a
     tank.
 
@@ -49,7 +50,7 @@ class Bot:
 
     For convenience, the bot also provides an `input_layer` method that returns
     a list of inputs to a neural network. This list contains the distance
-    sensor reading, represented as a list of floating-point numbers. The six 
+    sensor reading, represented as a list of floating-point numbers. The six
     indices represent the six possible states for the distance sensor reading.
     The index 0 represents no obstacle detected, while index 5 represents an
     obstacle very far away. The active state is represented by a 1.0 in the
@@ -113,9 +114,7 @@ class Bot:
         representingthe bot's current colour sensor reading, and distance
         sensor reading.
         """
-        input_layer = [
-            0.0 for _ in range(6)
-        ]  # 6 distance values.
+        input_layer = [0.0 for _ in range(6)]  # 6 distance values.
         # Set distance sensor reading.
         input_layer[self.distance_reading] = 1.0
         return input_layer
@@ -134,13 +133,9 @@ class StupidBot(Bot):
         """
         Very stupid hard coded rules for driving the bot.
         """
-        if (
-            self.distance_reading > 0
-        ):  # Close obstacle - turn around
+        if self.distance_reading > 0:  # Close obstacle - turn around
             if self.rotate_direction is None:
-                self.rotate_direction = random.choice(
-                    [(0.0, 1.0), (1.0, 0.0)]
-                )
+                self.rotate_direction = random.choice([(0.0, 1.0), (1.0, 0.0)])
             self.set_motors(*self.rotate_direction)
         else:  # No obstacle detected or far away - move forward
             self.rotate_direction = None  # Reset rotation direction
@@ -244,15 +239,15 @@ class BotWorld:
     def get_distance_ahead(self, x, y, angle):
         """
         Get the distance to any obstacles in front of the bot using a wider
-        sensor field of view. The sensor scans three rays: left-ahead, 
+        sensor field of view. The sensor scans three rays: left-ahead,
         straight-ahead, and right-ahead, then returns the closest detection.
         """
         # Define sensor field of view (sensors are not a single line).
         sensor_angles = [
             angle - 15,  # left-ahead
-            angle,       # straight-ahead  
-            angle + 15   # right-ahead
-        ]        
+            angle,  # straight-ahead
+            angle + 15,  # right-ahead
+        ]
         # Default: no obstacle detected.
         closest_distance = 0
         # Scan each direction in the sensor field of view.
@@ -321,7 +316,7 @@ class TrainingWorld(BotWorld):
         for bot in self.bots:
             # Forward speed is limited by the slower motor.
             forward_speed = min(bot.left_motor, bot.right_motor)
-            
+
             # Handle forward movement if there's any.
             if forward_speed > 0:
                 dx = math.sin(math.radians(bot.angle)) * forward_speed * 2
@@ -331,17 +326,22 @@ class TrainingWorld(BotWorld):
                 new_fy = bot.fy + dy
                 # New grid x/y coordinates.
                 nx, ny = int(round(new_fx)), int(round(new_fy))
-                # Check if the proposed new position is within bounds and 
+                # Check if the proposed new position is within bounds and
                 # free from obstacles.
-                if (0 <= nx < self.width and 0 <= ny < self.height and 
-                    (nx, ny) not in self.obstacles):
-                    # Only update fractional and integer positions if 
+                if (
+                    0 <= nx < self.width
+                    and 0 <= ny < self.height
+                    and (nx, ny) not in self.obstacles
+                ):
+                    # Only update fractional and integer positions if
                     # movement is valid.
                     bot.fx, bot.fy = new_fx, new_fy
                     bot.x, bot.y = nx, ny
                     # Update a counter in bot.travel_log for the visited
                     # coordinate.
-                    bot.travel_log[(nx, ny)] = bot.travel_log.get((nx, ny), 0) + 1
+                    bot.travel_log[(nx, ny)] = (
+                        bot.travel_log.get((nx, ny), 0) + 1
+                    )
                 else:
                     # Oops. Collision detected!
                     bot.collided = True

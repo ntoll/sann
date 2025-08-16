@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 from hub import port
 import motor, distance_sensor
 import random
@@ -45,18 +46,18 @@ class Bot:
         self.boost = 10000
         self.rotate_direction = None
         self.brain = brain
-    
+
     def set_motors(self, left, right):
         l_boost = int(left * self.boost)
         r_boost = -int(right * self.boost)
         print(l_boost, r_boost)
         motor.run(port.A, l_boost)
         motor.run(port.B, r_boost)
-    
+
     def engage(self):
         self.detect_distance()
         self.drive()
-    
+
     def detect_distance(self):
         cm = distance_sensor.distance(port.E) / 10
         result = 0
@@ -65,12 +66,10 @@ class Bot:
         self.distance_reading = result
 
     def input_layer(self):
-        input_layer = [
-            0.0 for _ in range(6)
-        ]
+        input_layer = [0.0 for _ in range(6)]
         input_layer[self.distance_reading] = 1.0
         return input_layer
-    
+
     def drive(self):
         if self.brain:
             # Use the neural network.
@@ -93,7 +92,7 @@ class Bot:
     def sum_inputs(self, inputs):
         return sum([x * w for x, w in inputs])
 
-    def sigmoid(self, activation, threshold = 0.0, shape = 0.5):
+    def sigmoid(self, activation, threshold=0.0, shape=0.5):
         return 1 / (1 + math.exp(-((activation - threshold) / shape)))
 
     def run_network(self, ann, input_layer: list):
@@ -101,7 +100,9 @@ class Bot:
         for layer in ann["layers"]:
             new_outputs = []
             for node in layer:
-                activation = self.sum_inputs(zip(output_layer, node["weights"]))
+                activation = self.sum_inputs(
+                    zip(output_layer, node["weights"])
+                )
                 new_outputs.append(self.sigmoid(activation, node["bias"]))
             output_layer = new_outputs
         return output_layer

@@ -74,7 +74,7 @@ Each neural network has an input layer of six nodes: one to indicate no
 obstacle has been detected, with the other five used to indicate how close
 a detected obstacle is. The output layer is simply two nodes, whose output
 values control the speed of the left and right motors. Twelve nodes make up
-the hidden network.
+the hidden layer in these networks.
 
 The "stupid" bot's hard-coded instructions were:
 

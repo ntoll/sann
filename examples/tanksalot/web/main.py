@@ -61,12 +61,17 @@ class WebBotWorld(BotWorld):
         # List of (x, y, age) tuples for each bread-crumb (circle) on the
         # trail.
         self.trails[bot] = []
-    
+
     async def tick(self):
         for bot in self.bots:
             # Move the bot based on its current state.
             bot.engage()
-            print(bot.distance_reading, bot.left_motor, bot.right_motor, bot.collided)
+            print(
+                bot.distance_reading,
+                bot.left_motor,
+                bot.right_motor,
+                bot.collided,
+            )
         await self.update_world()
 
     async def update_world(self):
@@ -86,10 +91,10 @@ class WebBotWorld(BotWorld):
             # If motors are different, the bot rotates around the slower motor.
             left_motor = bot.left_motor
             right_motor = bot.right_motor
-            
+
             # Forward speed is limited by the slower motor.
             forward_speed = min(left_motor, right_motor)
-            
+
             # Handle forward movement if there's any.
             if forward_speed > 0:
                 dx = math.sin(math.radians(bot.angle)) * forward_speed * 2
@@ -100,13 +105,16 @@ class WebBotWorld(BotWorld):
                 nx, ny = int(round(new_fx)), int(round(new_fy))
                 # Check if the proposed new position is within bounds and free
                 # from obstacles.
-                if (0 <= nx < self.width and 0 <= ny < self.height and 
-                    (nx, ny) not in self.obstacles):
+                if (
+                    0 <= nx < self.width
+                    and 0 <= ny < self.height
+                    and (nx, ny) not in self.obstacles
+                ):
                     # Only update fractional and integer positions if movement
                     # is valid.
                     bot.fx, bot.fy = new_fx, new_fy
                     bot.x, bot.y = nx, ny
-                    # Add trail breadcrumb at fractional position for smooth 
+                    # Add trail breadcrumb at fractional position for smooth
                     # diagonal trails.
                     self.trails[bot].append((bot.fx, bot.fy, 0))
                     while len(self.trails[bot]) > self.trail_max_length:
@@ -233,22 +241,22 @@ class WebBotWorld(BotWorld):
         """
         if bot.collided:
             return
-            
+
         max_sensor_range = 5
-        
+
         # Draw three sensor rays with 15° spread to show field of view
         sensor_angles = [
             angle_deg - 15,  # left-ahead
-            angle_deg,       # straight-ahead  
-            angle_deg + 15   # right-ahead
+            angle_deg,  # straight-ahead
+            angle_deg + 15,  # right-ahead
         ]
-        
+
         for i, sensor_angle in enumerate(sensor_angles):
             # Get individual distance reading for this ray
             ray_distance = self.get_single_ray_distance(
                 int(bot.fx), int(bot.fy), sensor_angle
             )
-            
+
             # Calculate line length based on detection
             if ray_distance == 0:
                 line_length = max_sensor_range * tile_size
@@ -260,21 +268,25 @@ class WebBotWorld(BotWorld):
                 max_intensity = 0.8  # Light gray for distant objects
                 intensity_range = max_intensity - min_intensity
                 distance_factor = (ray_distance - 1) / (max_sensor_range - 1)
-                effective_intensity = min_intensity + intensity_range * distance_factor
-            
+                effective_intensity = (
+                    min_intensity + intensity_range * distance_factor
+                )
+
             # Make outer rays slightly more transparent to show they're secondary
             if i != 1:  # Not the center ray
                 effective_intensity *= 0.9
-            
+
             # Calculate line end coordinates
             angle_rad = math.radians(sensor_angle)
             end_x = bot_x + math.sin(angle_rad) * line_length
             end_y = bot_y - math.cos(angle_rad) * line_length
-            
+
             # Draw the sensor ray
             self.ctx.save()
             color_value = int(effective_intensity * 255)
-            self.ctx.strokeStyle = f"rgb({color_value}, {color_value}, {color_value})"
+            self.ctx.strokeStyle = (
+                f"rgb({color_value}, {color_value}, {color_value})"
+            )
             self.ctx.lineWidth = 1
             self.ctx.setLineDash([3, 2])  # Dotted line
             self.ctx.beginPath()
@@ -288,11 +300,11 @@ class WebBotWorld(BotWorld):
         Get distance for a single sensor ray (helper for visualization).
         """
         dx, dy = self.get_direction_from_angle(angle)
-        
+
         for dist in range(1, 6):
             nx = int(round(x + dx * dist))
             ny = int(round(y + dy * dist))
-            
+
             if not (0 <= nx < self.width and 0 <= ny < self.height):
                 return dist
             if (nx, ny) in self.obstacles:
@@ -449,15 +461,14 @@ def add_sann_bot(ann_file, bw, color):
     angle = random.randint(0, 360)
     bw.add_bot(bot, location, location, angle, color)
 
-anns = {
-    "ann_supervised.json": (255, 0, 0),
-    "ann_evolved.json": (255, 255, 0)
-}
 
-#anns = {}
+anns = {"ann_supervised.json": (255, 0, 0), "ann_evolved.json": (255, 255, 0)}
+
+# anns = {}
 
 for filename, color in anns.items():
     add_sann_bot(filename, bw, color)
+
 
 async def main():
     while True:

@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 import sys
 
 sys.path.append("../../")  # Adjust path to import sann module
@@ -147,12 +148,13 @@ def halt_function(current_population, generation_count):
     else:
         # Increment the fitness last updated counter.
         fitness_last_updated += 1
-        # If the fitness has not improved for fitness_plateau_duration 
+        # If the fitness has not improved for fitness_plateau_duration
         # generations, halt training.
         if fitness_last_updated > fitness_plateau_duration:
             return True
         else:
             return False
+
 
 def evolve():
     """
@@ -200,10 +202,12 @@ def evaluate_model(ann, dataset):
         outputs = sann.run_network(ann, inputs)
         outputs = [round(o) for o in outputs if o < 0.2 or o > 0.8]
         average_score += sum(
-            1 for expected, actual in zip(expected_outputs, outputs)
+            1
+            for expected, actual in zip(expected_outputs, outputs)
             if expected == actual
         ) / len(expected_outputs)
     return average_score / len(dataset)
+
 
 def backprop_train(data):
     """
@@ -218,7 +222,7 @@ def backprop_train(data):
     with Progress() as progress:
         training_task = progress.add_task("Training network", total=epochs)
 
-         # Load the training data.
+        # Load the training data.
         with open(data, "r") as f:
             dataset = json.load(f)
 
@@ -235,7 +239,11 @@ def backprop_train(data):
 
         # Train the ANN
         ann = sann.train(
-            ann, dataset, epochs=epochs, learning_rate=learning_rate, log=handle_log
+            ann,
+            dataset,
+            epochs=epochs,
+            learning_rate=learning_rate,
+            log=handle_log,
         )
 
         # Remove the outputs stored in nodes to clean up the ANN
@@ -243,6 +251,7 @@ def backprop_train(data):
 
     with open("ann_supervised.json", "w") as f:
         json.dump(ann, f, indent=2)
+
 
 if __name__ == "__main__":
     evolve()
