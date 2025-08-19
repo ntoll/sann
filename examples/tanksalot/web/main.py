@@ -15,11 +15,10 @@ class WebBot(StupidBot):
     def __init__(self, world):
         super().__init__()
         self.world = world
+        self.sensor_readings = [0, 0, 0]  # Hold sensor readings (L, M, R).
 
     def detect_distance(self):
-        self.distance_reading = self.world.get_distance_ahead(
-            self.x, self.y, self.angle
-        )
+        self.distance_reading = self.world.get_distance_ahead(self)
 
 
 class WebBotWorld(BotWorld):
@@ -66,12 +65,6 @@ class WebBotWorld(BotWorld):
         for bot in self.bots:
             # Move the bot based on its current state.
             bot.engage()
-            print(
-                bot.distance_reading,
-                bot.left_motor,
-                bot.right_motor,
-                bot.collided,
-            )
         await self.update_world()
 
     async def update_world(self):

@@ -162,11 +162,16 @@ class SANNBot(Bot):
         # To contain the number of obstacles successfully detected, used
         # to assess the bot's fitness.
         self.obstacles_detected = 0
+        # Log the number of times the bot has changed direction, used to
+        # ensure the bot doesn't just keep going around in circles.
+        self.direction_changes = 0
+        # To track the bot's sensor readings.
+        self.sensor_readings = [0, 0, 0]  # Hold sensor readings (L, M, R).
+        # To track how many times the bot has steered away from walls.
+        self.away_from_walls = 0
 
     def detect_distance(self):
-        self.distance_reading = self.world.get_distance_ahead(
-            self.x, self.y, self.angle
-        )
+        self.distance_reading = self.world.get_distance_ahead(self)
         if self.distance_reading > 0:
             self.obstacles_detected += 1
 
@@ -180,8 +185,19 @@ class SANNBot(Bot):
         # Run the sensors through the neural network to get an output
         # decision.
         outputs = sann.run_network(self.brain, self.input_layer())
+        # Check for changes of direction in relation to the world.
+        left = outputs[0]
+        right = outputs[1]
+        if self.sensor_readings[0] > 0 and left < right:
+            self.away_from_walls += 1
+        elif self.sensor_readings[2] > 0 and right < left:
+            self.away_from_walls += 1
+        if self.left_motor < self.right_motor and left > right:
+            self.direction_changes += 1
+        elif self.right_motor < self.left_motor and right > left:
+            self.direction_changes += 1
         # Set the motor values according to the ANN's output.
-        self.set_motors(left=outputs[0], right=outputs[1])
+        self.set_motors(left=left, right=right)
 
 
 class BotWorld:
@@ -236,7 +252,7 @@ class BotWorld:
         angle_rad = math.radians(angle)
         return math.sin(angle_rad), -math.cos(angle_rad)
 
-    def get_distance_ahead(self, x, y, angle):
+    def get_distance_ahead(self, bot):
         """
         Get the distance to any obstacles in front of the bot using a wider
         sensor field of view. The sensor scans three rays: left-ahead,
@@ -244,35 +260,39 @@ class BotWorld:
         """
         # Define sensor field of view (sensors are not a single line).
         sensor_angles = [
-            angle - 15,  # left-ahead
-            angle,  # straight-ahead
-            angle + 15,  # right-ahead
+            bot.angle - 15,  # left-ahead
+            bot.angle,  # straight-ahead
+            bot.angle + 15,  # right-ahead
         ]
         # Default: no obstacle detected.
         closest_distance = 0
         # Scan each direction in the sensor field of view.
-        for sensor_angle in sensor_angles:
+        for i, sensor_angle in enumerate(sensor_angles):
+            bot.sensor_readings[i] = 0  # Initialize sensor reading.
             dx, dy = self.get_direction_from_angle(sensor_angle)
             # Scan the range of cells ahead for this direction in the
             # field of view.
             for dist in range(1, 6):
                 # Target cell coordinates.
-                nx = int(round(x + dx * dist))
-                ny = int(round(y + dy * dist))
+                nx = int(round(bot.x + dx * dist))
+                ny = int(round(bot.y + dy * dist))
                 # Check if the target cell is within bounds.
                 if not (0 <= nx < self.width and 0 <= ny < self.height):
                     if closest_distance == 0 or dist < closest_distance:
                         closest_distance = dist
+                        bot.sensor_readings[i] = dist
                     break
                 # Check if the target cell is occupied by an obstacle.
                 if (nx, ny) in self.obstacles:
                     if closest_distance == 0 or dist < closest_distance:
                         closest_distance = dist
+                        bot.sensor_readings[i] = dist
                     break
                 # Check for other bots at this position.
                 if any(other.x == nx and other.y == ny for other in self.bots):
                     if closest_distance == 0 or dist < closest_distance:
                         closest_distance = dist
+                        bot.sensor_readings[i] = dist
                     break
         return closest_distance
 

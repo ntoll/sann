@@ -39,9 +39,12 @@ from rich.progress import Progress
 # ANN layers
 layers = [6, 12, 2]
 # The number of ANNs in each generation.
-population_size = 100
+population_size = 200
 # The maximum number of generations to train for.
 max_generations = 100
+# The number of times to test each bot's fitness from a new location in
+# the world.
+test_runs = 5
 # The current highest fitness score.
 current_max_fitness = 0
 # The number of generations since the last fitness improvement.
@@ -62,67 +65,85 @@ def fitness_function(ann, current_population):
     are also added to the world, to give the current ann based bot others
     to avoid.
     """
-    # Create the training world and populate it with static obstacles.
-    tw = TrainingWorld(40, 40)
-    # Walls around the edges.
-    for x in range(40):
-        tw.add_obstacle(x, 0)
-        tw.add_obstacle(x, 39)
-    for y in range(40):
-        tw.add_obstacle(0, y)
-        tw.add_obstacle(39, y)
-    # Add a random amount of randomly placed walls into the world while
-    # keeping track of the positions of the walls so bots cannot be added
-    # to the same position.
-    wall_positions = set()
-    for _ in range(random.randint(10, 20)):
-        x = random.randint(1, 38)
-        y = random.randint(1, 38)
-        wall_positions.add((x, y))
-    for pos in wall_positions:
-        tw.add_obstacle(*pos)
-    # Add the bot, whose fitness we're checking, to the world, whilst
-    # avoiding the walls.
-    while True:
-        x = random.randint(1, 38)
-        y = random.randint(1, 38)
-        if (x, y) not in wall_positions:
-            break
-    bot = SANNBot(tw, ann)
-    tw.add_bot(bot, x, y)
-    # Now add the top 4 fittest bots from the current population to the world.
-    for ann in current_population[:4]:
+
+    def run_in_world():
+        # Create the training world and populate it with static obstacles.
+        tw = TrainingWorld(40, 40)
+        # Walls around the edges.
+        for x in range(40):
+            tw.add_obstacle(x, 0)
+            tw.add_obstacle(x, 39)
+        for y in range(40):
+            tw.add_obstacle(0, y)
+            tw.add_obstacle(39, y)
+        # Add a random amount of randomly placed walls into the world while
+        # keeping track of the positions of the walls so bots cannot be added
+        # to the same position.
+        wall_positions = set()
+        for _ in range(random.randint(10, 20)):
+            x = random.randint(1, 38)
+            y = random.randint(1, 38)
+            wall_positions.add((x, y))
+        for pos in wall_positions:
+            tw.add_obstacle(*pos)
+        # Add the bot, whose fitness we're checking, to the world, whilst
+        # avoiding the walls.
         while True:
             x = random.randint(1, 38)
             y = random.randint(1, 38)
             if (x, y) not in wall_positions:
                 break
-        tw.add_bot(SANNBot(tw, ann), x, y)
-    # Now run the world for the maximum number of ticks
-    for _ in range(max_game_ticks):
-        tw.tick()
-        if bot.collided:
-            # No need to continue if the bot has collided with something.
-            break
+        nonlocal ann
+        bot = SANNBot(tw, ann)
+        tw.add_bot(bot, x, y)
+        # Now add the top 4 fittest bots from the current population to the world.
+        for ann in current_population[:4]:
+            while True:
+                x = random.randint(1, 38)
+                y = random.randint(1, 38)
+                if (x, y) not in wall_positions:
+                    break
+            tw.add_bot(SANNBot(tw, ann), x, y)
+        # Now run the world for the maximum number of ticks
+        for _ in range(max_game_ticks):
+            tw.tick()
+            if bot.collided:
+                # No need to continue if the bot has collided with something.
+                break
+        return bot
+
+    # Run the bot, test_runs number of times, so we have a better estimate of
+    # its fitness.
+    bots = [run_in_world() for _ in range(test_runs)]
     fitness = 0.0
-    # The fittest bots will survive the longest in the world by avoiding all
-    # the obstacles, so the bot's lifespan is one measure of its fitness.
-    fitness += bot.lifespan
-    # The number of obstacles successfully detected is also a measure of
-    # fitness.
-    fitness += bot.obstacles_detected
-    # The number of positions in the world that the bot has been able to visit
-    # also indicates an ability to successfully navigate around the world.
-    # However, we penalise the bot for wall-banging behaviour by adding a cost
-    # for each position it has visited multiple times.
-    for pos, count in bot.travel_log.items():
-        fitness -= count
-    fitness += len(bot.travel_log) * 2
-    # If the bot has collided with something, that's a bad thing. So punish the
-    # fitness score by penalising earlier collisions more heavily, relative to
-    # how long the bot survived.
-    if bot.collided:
-        fitness -= 10
+    for bot in bots:
+        # The fittest bots will survive the longest in the world by avoiding all
+        # the obstacles, so the bot's lifespan is one measure of its fitness.
+        fitness += bot.lifespan / 2
+        # The number of obstacles successfully detected is also a measure of
+        # fitness.
+        fitness += bot.obstacles_detected
+        # The number of positions in the world that the bot has been able to visit
+        # also indicates an ability to successfully navigate around the world.
+        # However, we penalise the bot for wall-banging behaviour by adding a cost
+        # for each position it has visited multiple times.
+        for pos, count in bot.travel_log.items():
+            fitness -= count
+        fitness += len(bot.travel_log) * 1.5
+        # If the bot has collided with something, that's a bad thing. So punish the
+        # fitness score by penalising earlier collisions more heavily, relative to
+        # how long the bot survived.
+        if bot.collided:
+            fitness -= 1
+        # Reward the bot for changing direction, but not too much within its
+        # lifespan.
+        if bot.direction_changes > 0:
+            fitness += bot.lifespan / bot.direction_changes
+        else:
+            fitness -= 20  # Penalise if no direction changes.
+        # Reward the bot for steering away from walls.
+        fitness += bot.away_from_walls * 1.5
+    fitness /= test_runs
     fitness = max(0, fitness)
     return fitness
 
