@@ -122,7 +122,7 @@ def main():
     test_data = load_data(test_file)
 
     # Number of epochs to train over
-    epochs = 1000
+    epochs = 100
 
     # Learning rate (rate of change as weights are adjusted)
     learning_rate = 0.1
@@ -134,12 +134,23 @@ def main():
         10,
     ]  # Example: 64 input nodes, 32 hidden nodes, 10 output nodes
 
+    # Will eventually hold the best ANN found during training.
+    best_ann = {}
+
+    # The best accuracy score for the ANN to beat.
+    best_accuracy = 0
+
     with Progress() as progress:
         training_task = progress.add_task("Training network", total=epochs)
 
         def handle_log(data):
-            if isinstance(data, list):
+            if isinstance(data, dict):
                 accuracy = evaluate_model(data, test_data)
+                nonlocal best_accuracy
+                if accuracy > best_accuracy:
+                    nonlocal best_ann
+                    best_accuracy = accuracy
+                    best_ann = dict(data)
                 progress.update(
                     training_task,
                     advance=1,
@@ -159,7 +170,7 @@ def main():
         ann = sann.clean_network(ann)
 
     with open("nn.json", "w") as f:
-        json.dump(ann, f, indent=2)
+        json.dump(best_ann, f, indent=2)
 
 
 if __name__ == "__main__":

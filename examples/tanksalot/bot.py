@@ -314,6 +314,7 @@ class TrainingWorld(BotWorld):
         # Remove dead bots
         self.bots = [bot for bot in self.bots if not bot.collided]
         for bot in self.bots:
+            bot.lifespan += 1
             # Forward speed is limited by the slower motor.
             forward_speed = min(bot.left_motor, bot.right_motor)
 

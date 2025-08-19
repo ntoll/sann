@@ -462,7 +462,7 @@ def add_sann_bot(ann_file, bw, color):
     bw.add_bot(bot, location, location, angle, color)
 
 
-anns = {"ann_supervised.json": (255, 0, 0), "ann_evolved.json": (255, 255, 0)}
+anns = {"ann_supervised.json": (255, 0, 0), "ann_evolved.json": (255, 140, 0)}
 
 # anns = {}
 

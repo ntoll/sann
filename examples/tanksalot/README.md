@@ -70,7 +70,7 @@ Here's how it looks:
 
 <img src="./bots.gif" title="Tank bots."/>
 
-[See these bots running live in your browser](web/).
+[See these bots running live in your browser](./web/index.html).
 
 The "stupid" bot's hard-coded instructions were:
 

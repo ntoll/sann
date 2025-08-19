@@ -1,5 +1,11 @@
 # SANN Changelog
 
+## 1.0.4
+
+* Corrected default value of rho in sigmoid function from 0.5 to (the more conventional) 1.0.
+* Fixed minor bugs in the training scripts.
+* Re-trained all the examples to use the sigmoid function's new default settings.
+
 ## 1.0.3
 
 * Added "Tanks a lot" example to the documentation.

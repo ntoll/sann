@@ -28,7 +28,7 @@ import sys
 
 sys.path.append("../../")  # Adjust path to import sann module
 
-from docs.site.examples.digit_recognition.train import train_model
+from examples.digit_recognition.train import train_model
 import sann
 import json
 import rich
@@ -39,7 +39,7 @@ from rich.progress import Progress
 # ANN layers
 layers = [6, 12, 2]
 # The number of ANNs in each generation.
-population_size = 500
+population_size = 100
 # The maximum number of generations to train for.
 max_generations = 100
 # The current highest fitness score.
@@ -107,7 +107,7 @@ def fitness_function(ann, current_population):
     fitness = 0.0
     # The fittest bots will survive the longest in the world by avoiding all
     # the obstacles, so the bot's lifespan is one measure of its fitness.
-    fitness += bot.lifespan / 2
+    fitness += bot.lifespan
     # The number of obstacles successfully detected is also a measure of
     # fitness.
     fitness += bot.obstacles_detected
@@ -117,13 +117,13 @@ def fitness_function(ann, current_population):
     # for each position it has visited multiple times.
     for pos, count in bot.travel_log.items():
         fitness -= count
-    fitness += len(bot.travel_log) * 1.5
+    fitness += len(bot.travel_log) * 2
     # If the bot has collided with something, that's a bad thing. So punish the
     # fitness score by penalising earlier collisions more heavily, relative to
     # how long the bot survived.
     if bot.collided:
-        fitness -= 1
-    fitness = min(0, fitness)
+        fitness -= 10
+    fitness = max(0, fitness)
     return fitness
 
 
@@ -185,6 +185,7 @@ def evolve():
     # Save the fittest ANN to a file.
     with open(fittest_ann_file, "w") as f:
         ann = sann.clean_network(population[0])
+        ann["fitness"] = current_max_fitness
         json.dump(ann, f, indent=2)
         rich.print(
             f"[green]Fittest ANN ({current_max_fitness}) saved to: [bold]{fittest_ann_file}[/bold][/green]"

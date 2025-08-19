@@ -39,7 +39,7 @@ from snake import SnakeWorld
 from rich.progress import Progress
 
 # The number of ANNs in each generation.
-population_size = 500
+population_size = 200
 # The maximum number of generations to train for.
 max_generations = 100
 # The current highest fitness score.
@@ -47,7 +47,7 @@ current_max_fitness = 0
 # The number of generations since the last fitness improvement.
 fitness_last_updated = 0
 # The maximum number of ticks allowed in a single game.
-max_game_ticks = 100000
+max_game_ticks = 10000
 # The name of the file to save the fittest ANN.
 fittest_ann_file = "fittest_ann.json"
 
@@ -84,7 +84,7 @@ def fitness_function(ann, current_population):
     sw = SnakeWorld()
 
     for i in range(max_game_ticks):
-        # Up to 100000 iterations of the game.
+        # Up to max_game_ticks iterations of the game.
         if not sw.alive:
             # The snake is dead. No point continuing.
             break

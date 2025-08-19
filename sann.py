@@ -39,7 +39,7 @@ import math
 import random
 
 
-__version__ = "1.0.3"
+__version__ = "1.0.4"
 
 
 def sum_inputs(inputs: list[tuple[float, float]]) -> float:
@@ -51,7 +51,7 @@ def sum_inputs(inputs: list[tuple[float, float]]) -> float:
 
 
 def sigmoid(
-    activation: float, threshold: float = 0.0, shape: float = 0.5
+    activation: float, threshold: float = 0.0, shape: float = 1.0
 ) -> float:
     """
     Calculate the output value of a sigmoid based node.
